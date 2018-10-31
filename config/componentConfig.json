@@ -1,0 +1,275 @@
+{
+  "archivedData": {
+    "tables": [
+      "UJA_LOGGED_ON_A",
+      "UJB_STEP_RGN_O_A",
+      "UJB_TMPL_HDRT_A",
+      "UJB_TMPL_HDR_A"
+    ]
+  },
+  "books": {
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/BOOKS"
+    ],
+    "tables": [
+      "UJZ_BOOK_INFO",
+      "UJZ_FIXKEY",
+      "UJZ_PUB_BOOKS",
+      "UJZ_PUB_INFO"
+    ]
+  },
+  "BPFModeling": {
+    "tables": [
+      "UJB_DRV_DIM",
+      "UJB_MEM_ITEM",
+      "UJB_PS_ACTION",
+      "UJB_PS_ACTIONT",
+      "UJB_PS_ACTION_CV",
+      "UJB_PS_ACTION_PA",
+      "UJB_STEP",
+      "UJB_STEPT",
+      "UJB_STEP_RGN",
+      "UJB_TMPL",
+      "UJB_TMPLT",
+      "UJB_TMPL_ACC",
+      "UJB_TMPL_HDR",
+      "UJB_TMPL_HDRT",
+      "UJPS_CNTXT_HDR",
+      "UJPS_CNTXT_ITM",
+      "UJPS_PROPERTY",
+      "UJPS_RESOURCE",
+      "UJPS_RES_PAYLOAD",
+      "UJPS_TEAM_RES",
+      "UJPS_VIEW",
+      "UJPS_VIEWT",
+      "UJPS_VIEW_VALS"
+    ]
+  },
+  "BPFInstance": {
+    "tables": [
+      "UJB_INST",
+      "UJB_INST_OWN",
+      "UJB_INST_STEP",
+      "UJB_RGN_ACC",
+      "UJB_STEP_RGN_O",
+      "UJPS_CNTXT_HDR",
+      "UJPS_CNTXT_ITM",
+      "UJPS_PROPERTY",
+      "UJPS_RESOURCE",
+      "UJPS_RES_PAYLOAD",
+      "UJPS_TEAM_RES",
+      "UJPS_VIEW",
+      "UJPS_VIEWT",
+      "UJPS_VIEW_VALS"
+    ]
+  },
+  "businessRule": {
+    "tables": [
+      "UJP_DIM_GENERATE",
+      "UJP_FXTRANS",
+      "UJP_FXTRANSH",
+      "UJP_FXTRANSHT",
+      "UJP_METHOD",
+      "UJP_METHODH",
+      "UJP_METHODHT",
+      "UJP_RULE",
+      "UJP_RULEH",
+      "UJP_RULEHT"
+    ]
+  },
+  "commentData": {
+    "folder": [
+      "Comments.Audit.Journals/{applId}/COMMENT"
+    ]
+  },
+  "consolidationData": {},
+  "contentLibrary": {
+    "tables": [
+      "UJH_RCPT_TEAM",
+      "UJH_WEB_CONTENTS",
+      "UJPS_CNTXT_HDR",
+      "UJPS_CNTXT_ITM",
+      "UJPS_PROPERTY",
+      "UJPS_RESOURCE",
+      "UJPS_RES_PAYLOAD",
+      "UJPS_TEAM_RES",
+      "UJPS_VIEW",
+      "UJPS_VIEWT",
+      "UJPS_VIEW_VALS"
+    ]
+  },
+  "controlData": {},
+  "DAP": {
+    "tables": [
+      "UJE_MEMACCESS"
+    ]
+  },
+  "dataAuditData": {},
+  "dataManagerDataFile": {
+    "dependencies": [
+      "modeling"
+    ],
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/DATAFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/DATAFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/DATAFILES"
+    ]
+  },
+  "dataManagerLog": {
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/MACROFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/MACROFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/MACROFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/SELECTIONFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/SELECTIONFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/SELECTIONFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/tempfiles"
+    ]
+  },
+  "dataManagerModeling": {
+    "tables": [
+      "UJD_INSTRUCTION2",
+      "UJD_LINK",
+      "UJD_PACKAGES2",
+      "UJD_PACKAGEST2",
+      "UJD_PACKAGE_LINK"
+    ],
+    "dependencies": [
+      "modeling"
+    ]
+  },
+  "dataManagerTransFile": {
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/CONVERSIONFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/TRANSFORMATIONFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/CONVERSIONFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/TRANSFORMATIONFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/CONVERSIONFILES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/TRANSFORMATIONFILES"
+    ],
+    "dependencies": [
+      "dataManagerModeling"
+    ]
+  },
+  "dimension": {
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/{originalAppsetId}/ADMINAPP/DIMENSION FORMULA"
+    ],
+    "tables": [
+      "UJA_DIMENSION",
+      "UJA_DIMENSIONT",
+      "UJA_DIM_ATTR",
+      "UJA_DIM_HIER2",
+      "UJA_DIM_OPT"
+    ]
+  },
+  "documents": {
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/{originalAppsetId}/DOCUMENTS",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/DOCUMENTS_STAGING"
+    ]
+  },
+  "environment": {
+    "tables": [
+      "UJA_APPSETT",
+      "UJA_APPSET_INFO",
+      "UJW_EMAIL10T"
+    ]
+  },
+  "excelClient": {
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/INPUT SCHEDULES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/PDBOOKS",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/REPORTS",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/EEXCEL/INPUT SCHEDULES",
+      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/EEXCEL/REPORTS"
+    ],
+    "dependencies": [
+      "fileService"
+    ]
+  },
+  "fileService": {
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/ADMINTEMPLATES"
+    ],
+    "tables": [
+      "UJF_DOC",
+      "UJF_DOCTREE"
+    ]
+  },
+  "journalData": {
+    "folder": [
+      "Comments.Audit.Journals/{applId}/JOURNAL_DETAIL"
+    ]
+  },
+  "masterData": {
+    "dependencies": [
+      "modeling"
+    ]
+  },
+  "model": {
+    "tables": [
+      "UJ0_PARAM_APP",
+      "UJA_APPL",
+      "UJA_APPLT",
+      "UJA_DIM_APPL",
+      "UJA_FORMULA_APP",
+      "UJA_USER_DEF",
+      "UJU_AUD_CTL",
+      "UJW_APPL_STATUS",
+      "UJW_EMAIL10",
+      "UJW_LCK_DIM",
+      "UJJ_JRNBACKUP"
+    ]
+  },
+  "obsolete": {
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/{originalAppsetId}/SCRATCHREPOSITORY"
+    ]
+  },
+  "others": {
+    "tables": [
+      "UJA_LOGGED_ON",
+      "UJA_USAGE_LOG",
+      "UJC_FEED",
+      "UJC_FEED_COM"
+    ]
+  },
+  "persistenceResource": {
+    "tables": [
+      "UJPS_ALIAS",
+      "UJPS_RESOURCE",
+      "UJPS_TEAM_RES",
+      "UJPS_VIEW",
+      "UJPS_VIEWT"
+    ]
+  },
+  "scriptLogic": {
+    "fileServicePath": [
+      "ROOT/WEBFOLDERS/{originalAppsetId}/ADMINAPP/{applId}"
+    ]
+  },
+  "taskProfile": {
+    "tables": [
+      "UJE_PROFILE_AGR"
+    ]
+  },
+  "team": {
+    "tables": [
+      "UJE_TEAM_AGR",
+      "UJE_TEAM_MULTAGR"
+    ]
+  },
+  "transactionData": {
+    "dependencies": [
+      "modeling",
+      "masterData"
+    ]
+  },
+  "user": {
+    "tables": [
+      "UJE_USER_AGR"
+    ]
+  },
+  "workstatusLock": {}
+}

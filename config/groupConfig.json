@@ -1,0 +1,96 @@
+{
+  "default": {
+    "defaultKeepInFile": "false",
+    "groupDefination": {
+      "archivedData": {
+        "keepInFile": "flase",
+        "components": [
+          "archivedData"
+        ]
+      },
+      "BPFModeling": {
+        "keepInFile": "true",
+        "components": [
+          "BPFModeling"
+        ]
+      },
+      "contentLibrary": {
+        "keepInFile": "flase",
+        "components": [
+          "contentLibrary"
+        ]
+      },
+      "dataManagerData": {
+        "keepInFile": "flase",
+        "components": [
+          "dataManagerDataFile",
+          "dataManagerTransFile"
+        ]
+      },
+      "documents": {
+        "keepInFile": "flase",
+        "components": [
+          "documents"
+        ]
+      },
+      "excelClientData": {
+        "keepInFile": "flase",
+        "components": [
+          "excelClient",
+          "books"
+        ]
+      },
+      "masterData": {
+        "keepInFile": "true",
+        "components": [
+          "masterData"
+        ]
+      },
+      "transactionData": {
+        "keepInFile": "false",
+        "components": [
+          "transactionData"
+        ]
+      },
+      "metaData": {
+        "keepInFile": "true",
+        "components": [
+          "modeling",
+          "dataManagerModeling",
+          "fileService",
+          "scriptLogic",
+          "businessRule",
+          "persistenceResource"
+        ]
+      },
+      "obsolete": {
+        "keepInFile": "flase",
+        "components": [
+          "obsolete",
+          "others"
+        ]
+      },
+      "runTimeData": {
+        "keepInFile": "flase",
+        "components": [
+          "commentData",
+          "dataManagerLog",
+          "workstatusLock",
+          "dataAuditData",
+          "journalData",
+          "controlData",
+          "consolidationData"
+        ]
+      },
+      "securityData": {
+        "keepInFile": "flase",
+        "components": [
+          "DAP",
+          "taskProfile",
+          "team",
+          "user"
+        ]
+      }
+    }
+  }
+}

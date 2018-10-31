@@ -1,0 +1,17 @@
+{
+  "name": "utilforrestore",
+  "version": "1.0.0",
+  "description": "support simplify the BPC restore file so that not all file should be restored, this is used to enhance restore performance",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sunwei",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "fs-extra": "^7.0.0",
+    "xml2js": "^0.4.19",
+    "xmlbuilder": "^10.1.1"
+  }
+}
