@@ -25,7 +25,7 @@ for(sGroupName in oGroupConfig.groupDefination){
 			}
 			let iTableCount = componentConfig[sComName].tables ? componentConfig[sComName].tables.length : 0;
 			for(iTableIndex=0; iTableIndex<iTableCount; iTableIndex++){
-				oTablesOperate[componentConfig[sComName].tables[iTableIndex]] = bKeepInFile ? operateCons.KEEP : operateCons.REMOVE;
+				oTablesOperate[componentConfig[sComName].tables[iTableIndex]] = bKeepInFile ? operateCons.OPERATE.KEEP : operateCons.OPERATE.REMOVE;
 			}
 		}
 	}

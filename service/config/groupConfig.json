@@ -55,7 +55,9 @@
       "metaData": {
         "keepInFile": "true",
         "components": [
-          "modeling",
+          "dimension",
+          "environment",
+          "model",
           "dataManagerModeling",
           "fileService",
           "scriptLogic",
