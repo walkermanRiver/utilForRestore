@@ -3,5 +3,6 @@
 		"KEEP": 1,
 		"REMOVE": 2,
 		"UNKNOWN": 3
-	}
+	},
+	"SPLITROWCOUNT": 2000
 }

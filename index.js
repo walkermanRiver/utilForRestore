@@ -2,7 +2,7 @@ var fs = require('fs'),
     fsExtra = require('fs-extra'),
     // xml2js = require('xml2js'),    
     context = require('./service/context'),
-    bigXml = require('big-xml'),
+    // bigXml = require('big-xml'),
     config = require('./service/configuration');
 
 // var parser = new xml2js.Parser();
@@ -14,14 +14,32 @@ fs.mkdirSync(sOutPutFolder);
 // var sSourceFileName = __dirname + '/exampleData/Metadata.xml';
 var sSourceFileName = __dirname + '/testFile.xml';
 
-var reader = bigXml.createReader(sSourceFileName, /^(UJ*)$/, { gzip: false });
-reader.on('record', function(record) {
-  console.log(record);
+
+// var readStream = fs.createReadStream(sSourceFileName);
+// readStream.pipe(process.stdout);
+
+const readline = require('readline');
+
+var myInterface = readline.createInterface({
+  input: fs.createReadStream(sSourceFileName)
 });
 
-reader.on('error', function(err) {
-  console.log(err);
+var lineno = 0;
+myInterface.on('line', function (line) {
+  lineno++;
+  console.log('Line number ' + lineno + ': ' + line);
 });
+
+// var readStream = fs.createReadStream(sSourceFileName);
+// readStream.setEncoding('UTF8');
+// readStream
+//   .on('data', function (chunk) {
+//   	console.log("new chunk");
+//     console.log(chunk);
+//   })
+//   .on('end', function () {
+//     console.log("done");
+//   });
 
 // fs.readFile(__dirname + '/exampleData/Metadata.xml', function(err, data) {
 // // fs.readFile(__dirname + '/testFile.xml', function(err, data) {
