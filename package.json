@@ -9,6 +9,7 @@
   "author": "sunwei",
   "license": "ISC",
   "dependencies": {
+    "big-xml": "^1.0.0",
     "express": "^4.16.4",
     "fs-extra": "^7.0.0",
     "xml2js": "^0.4.19",

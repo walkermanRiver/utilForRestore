@@ -1,53 +1,59 @@
 var fs = require('fs'),
     fsExtra = require('fs-extra'),
-    xml2js = require('xml2js'),
+    // xml2js = require('xml2js'),    
     context = require('./service/context'),
+    bigXml = require('big-xml'),
     config = require('./service/configuration');
 
-const operateCons = require("./service/config/constants.json");
-var serviceConfig = require("./service/config/serviceConfig"); 
-
-// var componentConfig = require('./service/config/componentConfig.json');
-// var groupConfig = require('./service/config/groupConfig.json');
-
-var parser = new xml2js.Parser();
+// var parser = new xml2js.Parser();
 var sOutPutFolder = __dirname + "/tempFolder";
 
 fsExtra.removeSync(sOutPutFolder);
 fs.mkdirSync(sOutPutFolder);
 
-fs.readFile(__dirname + '/testFile.xml', function(err, data) {
-    parser.parseString(data, function (err, oResult) {
-        if(err){
-            console.log("parse xml file error, the error is :" + err);
-            return;
-        }
+// var sSourceFileName = __dirname + '/exampleData/Metadata.xml';
+var sSourceFileName = __dirname + '/testFile.xml';
 
-        let oOriTables = context.parseXMLInfo(config, oResult); 
-        oTableNames =  context.getTableList();
-        for(sTableName in oTableNames){            
-            let sTableContent = JSON.stringify(oOriTables[sTableName]); 
-            fs.writeFile(sOutPutFolder + '/' + sTableName, sTableContent, function(err) {
-                if(err) {
-                    return console.log(err);
-                }                
-            }); 
-        }
-        console.log("All the DDIC files are saved seperately!");
-
-        // console.dir(result);
-        // let sMetadata = JSON.stringify(result);
-        // console.log(sMetadata);
-        
-  //       fs.writeFile(__dirname + '/testJson.json', sMetadata, function(err) {
-		//     if(err) {
-		//         return console.log(err);
-		//     }
-		//     console.log("The file was saved!");
-		// }); 
-		console.log('Done');
-    });
+var reader = bigXml.createReader(sSourceFileName, /^(UJ*)$/, { gzip: false });
+reader.on('record', function(record) {
+  console.log(record);
 });
+
+reader.on('error', function(err) {
+  console.log(err);
+});
+
+// fs.readFile(__dirname + '/exampleData/Metadata.xml', function(err, data) {
+// // fs.readFile(__dirname + '/testFile.xml', function(err, data) {
+//     parser.parseString(data, function (err, oResult) {
+//         if(err){
+//             console.log("parse xml file error, the error is :" + err);
+//             return;
+//         }
+
+//         let oOriTables = context.parseXMLInfo(config, oResult); 
+
+//         //clear memory
+//         oResult = null;
+
+//         oTableNames =  context.getTableList();
+//         for(sTableName in oTableNames){
+//             let aNewRows = context.formatJson(oOriTables[sTableName]);
+//             if(!aNewRows || aNewRows.length === 0){
+//                 console.log("Skip table " + sTableName + " when format data!");
+//                 continue;
+//             }
+//             let sTableContent = JSON.stringify(aNewRows); 
+//             fs.writeFileSync (sOutPutFolder + '/' + sTableName + ".json", sTableContent); 
+
+//             //clear memory 
+//             delete oOriTables[sTableName];
+//         }
+//         console.log("All the DDIC files are saved seperately!");
+
+// 		console.log('Done');
+//     });
+// });
 
 
 

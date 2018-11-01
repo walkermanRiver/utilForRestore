@@ -47,5 +47,20 @@ var getTableList = function(){
 	return oTableNames;
 }
 
+var formatJson = function(aOldData){
+    let iTotalRowCount = aOldData[0].Row.length;
+    if(iTotalRowCount === 0){
+        return null;
+    }
+    var aRows = [];
+    for(let iIndex=0; iIndex<iTotalRowCount; iIndex++){
+        let oOldRow = aOldData[0].Row[iIndex];
+        aRows.push(oOldRow.$);
+    }
+    return aRows;
+
+}
+
 exports.parseXMLInfo = parseXMLInfo;
 exports.getTableList = getTableList;
+exports.formatJson = formatJson;
