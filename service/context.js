@@ -1,3 +1,5 @@
+const operateCons = require("./config/constants.json"); 
+
 var oTableNames = {};
 var sAppsetName = null;
 var aModelNameList = [];
@@ -5,7 +7,7 @@ var aDimensionNameList = [];
 var oComponentConfig = null;
 var oGroupConfig = null;
 
-var parseXMLInfo = function(oResult){
+var parseXMLInfo = function(config, oResult){
 	sAppsetName = oResult.AppsetData.$.APPSET_ID;
     console.log("appsetId is :" + sAppsetName);
 
@@ -15,18 +17,29 @@ var parseXMLInfo = function(oResult){
         return;
     }
 
-    let oTables = aMetadata[0];      
-    collectDDICTableName(oTables);
+    let defaultOperate = config.getDefaultOperate();
+
+    let oTables = aMetadata[0];  
+    oTablesOperate = config.getTablesOperate();
+    collectDDICTableName(oTablesOperate, oTables);
     return oTables;
 }
 
-var collectDDICTableName = function(oTables){
+var collectDDICTableName = function(oTablesOperate, oTables, defaultOperate){
 	let iCount = Object.getOwnPropertyNames(oTables).length;
     console.log("There are " + iCount + " DDIC tables");
 
     for(sTableName in oTables){    	
-        console.log("ddic table name ===> " + sTableName);
-        oTableNames[sTableName] = true;
+        if(oTables.hasOwnProperty(sTableName)){
+        // if(oTables.hasOwnProperty(sTableName) && oTablesOperate[sTableName]){
+            if( (!oTablesOperate[sTableName] && defaultOperate === operateCons.OPERATE.KEEP) ||
+                (oTablesOperate[sTableName] === operateCons.OPERATE.KEEP) ){
+                console.log("kept ddic table name ===> " + sTableName);
+                oTableNames[sTableName] = true;
+            }else{
+                console.log("removed ddic table name ===> " + sTableName);
+            }            
+        }        
     }
 }
 

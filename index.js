@@ -1,8 +1,15 @@
 var fs = require('fs'),
     fsExtra = require('fs-extra'),
     xml2js = require('xml2js'),
-    context = require('./service/context');
- 
+    context = require('./service/context'),
+    config = require('./service/configuration');
+
+const operateCons = require("./service/config/constants.json");
+var serviceConfig = require("./service/config/serviceConfig"); 
+
+// var componentConfig = require('./service/config/componentConfig.json');
+// var groupConfig = require('./service/config/groupConfig.json');
+
 var parser = new xml2js.Parser();
 var sOutPutFolder = __dirname + "/tempFolder";
 
@@ -16,7 +23,7 @@ fs.readFile(__dirname + '/testFile.xml', function(err, data) {
             return;
         }
 
-        let oOriTables = context.parseXMLInfo(oResult); 
+        let oOriTables = context.parseXMLInfo(config, oResult); 
         oTableNames =  context.getTableList();
         for(sTableName in oTableNames){            
             let sTableContent = JSON.stringify(oOriTables[sTableName]); 
