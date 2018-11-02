@@ -2,6 +2,7 @@ var fs = require('fs'),
     fsExtra = require('fs-extra'),
     // xml2js = require('xml2js'),    
     context = require('./service/context'),
+    xmlFileUtil = require('./service/xmlFileUtility'),
     // bigXml = require('big-xml'),
     config = require('./service/configuration');
 
@@ -24,8 +25,27 @@ var myInterface = readline.createInterface({
   input: fs.createReadStream(sSourceFileName)
 });
 
-var lineno = 0;
+var iLineNo = 0;
+var bGetRoot = false;
+var bNextNewTrunk = false;
 myInterface.on('line', function (line) {
+    iLineNo++;
+    if(!bGetRoot){        
+        if(iLineNo > 10){
+            console.log('DO NOT Find root and can not parse the XML file');
+            return;
+        }
+        bGetRoot = xmlFileUtil.isRootComplete(line);
+        fs.appendFileSync(sOutPutFolder + '/root.xml', line.toString() + "\n");
+        if(bGetRoot === true){
+            iLineNo = 0;            
+        }
+        
+    }else{
+
+        bNextNewTrunk
+    }
+
   lineno++;
   console.log('Line number ' + lineno + ': ' + line);
 });
