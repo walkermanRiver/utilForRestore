@@ -2,11 +2,13 @@ const operateCons = require("./config/constants.json");
 
 var oTableNames = {};
 var oMapTableChunk = {};
+var oChunkSize = {};
 var sAppsetName = null;
 var aModelNameList = [];
 var aDimensionNameList = [];
 var oComponentConfig = null;
 var oGroupConfig = null;
+var oAppset = {};
 
 var parseXMLInfo = function(config, oResult){
 	sAppsetName = oResult.AppsetData.$.APPSET_ID;
@@ -63,15 +65,29 @@ var formatJson = function(aOldData){
 };
 
 var addTableMapping = function(sTableName, sChunkName){
-    oMapTableChunk[sTableName] = sChunkName;
+    if(!oMapTableChunk[sTableName]){
+        oMapTableChunk[sTableName] = [];
+    }
+    oMapTableChunk[sTableName].push(sChunkName);
 };
 
 var getTableMapping = function(){
     return oMapTableChunk;
 }
 
+var addChunkSize = function(sChunkName, iSize){
+    oChunkSize[sChunkName] = iSize;
+};
+
+var getChunkSize = function(){
+    return oChunkSize;
+};
+
 exports.parseXMLInfo = parseXMLInfo;
 exports.getTableList = getTableList;
 exports.formatJson = formatJson;
 exports.addTableMapping = addTableMapping;
 exports.getTableMapping = getTableMapping;
+exports.addChunkSize = addChunkSize;
+exports.getChunkSize = getChunkSize;
+exports.oAppset = oAppset;

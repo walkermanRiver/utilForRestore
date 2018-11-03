@@ -1,98 +1,46 @@
 var fs = require('fs'),
     fsExtra = require('fs-extra'),
-    // xml2js = require('xml2js'),    
-    context = require('./service/context'),
-    xmlFileUtil = require('./service/xmlFileUtility'),
-    // bigXml = require('big-xml'),
-    operateCons = require("./service/config/constants.json"),
-    config = require('./service/configuration');
+    // xml2js = require('xml2js'),
+    metaDataProcessor = require('./service/metaDataProcessor');
+    // context = require('./service/context'),
+    // xmlFileUtil = require('./service/xmlFileUtility'),    
+    // config = require('./service/configuration'),
+    // readline = require('readline');
 
+// const operateCons = require("./service/config/constants.json");
 // var parser = new xml2js.Parser();
-var sOutPutFolder = __dirname + "/tempFolder";
+// var sOutPutXMLFolder = __dirname + "/tempFolder";
+// var sSourceXMLFile = __dirname + '/exampleData/Metadata.xml';
 
-fsExtra.removeSync(sOutPutFolder);
-fs.mkdirSync(sOutPutFolder);
+function getSourceXMLFile(){
+	const sSourceXMLFile = __dirname + '/exampleData/Metadata.xml';
+	return sSourceXMLFile;
+}
 
-var sSourceFileName = __dirname + '/exampleData/Metadata.xml';
+function getTempFolder(){
+	const sOutPutXMLFolder = __dirname + "/tempFolder";
+	return sOutPutXMLFolder;
+}
+
+function cleanTempFiles(sOutPutFolder){
+	fsExtra.removeSync(sOutPutFolder);
+	fs.mkdirSync(sOutPutFolder);
+}
+
+let sOutPutXMLFolder = getTempFolder();
+let sSourceXMLFile = getSourceXMLFile();
+cleanTempFiles(sOutPutXMLFolder);
+metaDataProcessor.preProcessSoureFile(sSourceXMLFile,sOutPutXMLFolder);
+
 // var sSourceFileName = __dirname + '/testFile.xml';
 
 
 // var readStream = fs.createReadStream(sSourceFileName);
 // readStream.pipe(process.stdout);
 
-const readline = require('readline');
 
-var myInterface = readline.createInterface({
-  input: fs.createReadStream(sSourceFileName)
-});
 
-var iLineNo = 0;
-var iContentCount = 0;
-var iChunkNo = 1;
-var bGetRoot = false;
-var bStartChunk = false;
-var bNextNewTrunk = false;
-var sChunkFileName = sOutPutFolder + '/chunk' + iChunkNo + '.xml';
-myInterface.on('line', function (line) {	
-	if(xmlFileUtil.ifNeedWrite(line) === false){
-		return;
-	}
 
-    iLineNo++;
-
-    if(!bGetRoot){        
-        if(iLineNo > 10){
-            console.log('DO NOT Find root and can not parse the XML file');
-            return;
-        }
-        bGetRoot = xmlFileUtil.isRootComplete(line.toString());
-        fs.appendFileSync(sOutPutFolder + '/root.xml', line.toString() + "\n");
-        if(bGetRoot === true){        	
-        	fs.appendFileSync(sOutPutFolder + '/root.xml', '</AppsetData>' + "\n");
-            iLineNo = 0;
-            bStartChunk = true;               
-        }
-        
-    }else{
-    	if(bStartChunk === true){
-    		bStartChunk = false;
-    		fs.appendFileSync(sChunkFileName, '<Metadata>' + "\n");
-    	}
-    	if(iLineNo <= operateCons.SPLITROWCOUNT && iContentCount <= operateCons.SPLITCONTENTlENGTH){
-    		if(xmlFileUtil.isNextNewTrunk(line.toString())){
-    			let sTableName = xmlFileUtil.parseTableName(line.toString());
-    			context.addTableMapping(sTableName,iChunkNo);
-    		}
-    		fs.appendFileSync(sChunkFileName, line.toString() + "\n");
-    		iContentCount = iContentCount + line.length;
-    		return;
-    	}    	
-    	
-        bNextNewTrunk = xmlFileUtil.isNextNewTrunk(line.toString());
-        if(bNextNewTrunk === true){        	
-        	if(iLineNo > 0){
-        		fs.appendFileSync(sChunkFileName, '</Metadata>' + "\n");        		
-        		iChunkNo++;
-        		sChunkFileName = sOutPutFolder + '/chunk' + iChunkNo + '.xml';
-        		let sTableName = xmlFileUtil.parseTableName(line.toString());
-    			context.addTableMapping(sTableName,iChunkNo);
-        	}
-
-        	iLineNo = 0;
-        	iContentCount = 0;
-        	
-        	fs.appendFileSync(sChunkFileName, '<Metadata>' + "\n");
-        }
-
-        fs.appendFileSync(sChunkFileName, line.toString() + "\n");
-        iContentCount = iContentCount + line.length;      
-    } 
-  // console.log('Line number ' + lineno + ': ' + line);
-});
-
-myInterface.on('close', function () {
-	fs.appendFileSync(sChunkFileName, '</Metadata>' + "\n");
-});
 
 
 // var readStream = fs.createReadStream(sSourceFileName);
