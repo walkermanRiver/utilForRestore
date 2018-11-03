@@ -1,6 +1,7 @@
 const operateCons = require("./config/constants.json"); 
 
 var oTableNames = {};
+var oMapTableChunk = {};
 var sAppsetName = null;
 var aModelNameList = [];
 var aDimensionNameList = [];
@@ -23,7 +24,7 @@ var parseXMLInfo = function(config, oResult){
     oTablesOperate = config.getTablesOperate();
     collectDDICTableName(oTablesOperate, oTables);
     return oTables;
-}
+};
 
 var collectDDICTableName = function(oTablesOperate, oTables, defaultOperate){
 	let iCount = Object.getOwnPropertyNames(oTables).length;
@@ -41,11 +42,11 @@ var collectDDICTableName = function(oTablesOperate, oTables, defaultOperate){
             }            
         }        
     }
-}
+};
 
 var getTableList = function(){
 	return oTableNames;
-}
+};
 
 var formatJson = function(aOldData){
     let iTotalRowCount = aOldData[0].Row.length;
@@ -59,8 +60,18 @@ var formatJson = function(aOldData){
     }
     return aRows;
 
+};
+
+var addTableMapping = function(sTableName, sChunkName){
+    oMapTableChunk[sTableName] = sChunkName;
+};
+
+var getTableMapping = function(){
+    return oMapTableChunk;
 }
 
 exports.parseXMLInfo = parseXMLInfo;
 exports.getTableList = getTableList;
 exports.formatJson = formatJson;
+exports.addTableMapping = addTableMapping;
+exports.getTableMapping = getTableMapping;
