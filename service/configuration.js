@@ -31,13 +31,91 @@ for(sGroupName in oGroupConfig.groupDefination){
 	}
 }
 
+function validateComponent(oGroupConfig,componentConfig){
+	var oComponents = prepareComponent(oGroupConfig,componentConfig);
+
+	var aComponents = [];
+
+	for(sComponentName in oComponents){
+		if(oComponents[sComponentName]["checked"] === false){
+			if(oComponents[sComponentName].dependencies){
+				let iLength = oComponents[sComponentName].dependencies.length;
+				for(let iIndex=0; iIndex<iLength; iIndex++){
+					let oDependedCom = oComponents[oComponents[sComponentName].dependencies[iIndex]];
+					if(oDependedCom){
+						if(oDependedCom["checked"] === false ){
+							//TBD
+						}
+					}else{
+						console.log("Depended Component " + oComponents[sComponentName].dependencies[iIndex] + " does not exist");	        		
+	        			return false;
+					}
+				}
+			}
+		}
+	}
+}
+
+//only collect components that is configured kept, but are not validated based on dependency
+function prepareComponent(oGroupConfig,componentConfig){
+	let bCorrect = checkDependency(oGroupConfig,componentConfig);
+	if(bCorrect === false){
+		return false;
+	}
+	
+	let oComponents = {};
+	for(sComponentName in componentConfig){
+		if(componentConfig.hasOwnProperty(sComponentName)){
+			oComponents[sComponentName] = {};
+			oComponents[sComponentName].dependencies = componentConfig.dependencies;
+			oComponents[sComponentName]["keep"] = defaultOperator;
+		}
+	}
+
+	for(sGroupName in oGroupConfig.groupDefination){
+		if(oGroupConfig.groupDefination.hasOwnProperty(sGroupName)){		
+			let oGroupDefination = oGroupConfig.groupDefination[sGroupName];
+			let bKeepInFile = oGroupDefination.keepInFile;			
+			let iCompCount = oGroupDefination.components.length;
+			for(let iIndex=0; iIndex<iCompCount; iIndex++){
+				sComName = oGroupDefination.components[iIndex];
+				if(!componentConfig[sComName]){
+					console.log("Component " + sComName + " does not exist which is defined in group " + sGroupName);	        		
+	        		return false;
+				}
+
+				let bKeep = bKeepInFile ? operateCons.OPERATE.KEEP : operateCons.OPERATE.REMOVE;
+				oComponents[sComName]["keep"] = bKeep;				
+			}
+		}
+	}
+
+	for(sComponentName in oComponents){
+		if(oComponents[sComName]["keep"] === operateCons.OPERATE.REMOVE){
+			delete oComponents[sComName];
+		}	
+	}
+}
+
+
+//check one component can be kept only if all its dependency are kept
+function checkComKeepDepd(oComponents, sComName, iIndex){
+
+}
+
+//check if the groupConfig.json has cycle dependency
+function checkDependency(oGroupConfig, componentConfig){
+	//TBD
+	return true;
+}
+
 var getTablesOperate = function(){
 	return oTablesOperate;
-}
+};
 
 var getDefaultOperate = function(){
 	return defaultOperator;
-}
+};
 
 exports.getTablesOperate = getTablesOperate;
 exports.getDefaultOperate = getDefaultOperate;

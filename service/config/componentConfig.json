@@ -1,13 +1,21 @@
 {
   "archivedData": {
+    "dependencies": [
+      "environment",
+      "BPFInstance"
+    ],
     "tables": [
       "UJA_LOGGED_ON_A",
       "UJB_STEP_RGN_O_A",
       "UJB_TMPL_HDRT_A",
       "UJB_TMPL_HDR_A"
-    ]
+    ]    
   },
   "books": {
+    "dependencies": [
+      "model",
+      "fileService"
+    ],
     "fileServicePath": [
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/BOOKS"
     ],
@@ -19,6 +27,10 @@
     ]
   },
   "BPFModeling": {
+    "dependencies": [
+      "environment",
+      "persistenceResource"   
+    ],
     "tables": [
       "UJB_DRV_DIM",
       "UJB_MEM_ITEM",
@@ -46,6 +58,9 @@
     ]
   },
   "BPFInstance": {
+    "dependencies": [
+      "BPFModeling"     
+    ],
     "tables": [
       "UJB_INST",
       "UJB_INST_OWN",
@@ -64,6 +79,9 @@
     ]
   },
   "businessRule": {
+    "dependencies": [
+      "model"     
+    ],
     "tables": [
       "UJP_DIM_GENERATE",
       "UJP_FXTRANS",
@@ -78,12 +96,21 @@
     ]
   },
   "commentData": {
+    "dependencies": [
+      "model"     
+    ],
     "folder": [
       "Comments.Audit.Journals/{applId}/COMMENT"
     ]
   },
-  "consolidationData": {},
+  "consolidationData": {
+
+  },
   "contentLibrary": {
+    "dependencies": [
+      "environment",
+      "persistenceResource"   
+    ],
     "tables": [
       "UJH_RCPT_TEAM",
       "UJH_WEB_CONTENTS",
@@ -100,14 +127,19 @@
   },
   "controlData": {},
   "DAP": {
+    "dependencies": [
+      "model"     
+    ],
     "tables": [
       "UJE_MEMACCESS"
     ]
   },
-  "dataAuditData": {},
+  "dataAuditData": {
+
+  },
   "dataManagerDataFile": {
     "dependencies": [
-      "modeling"
+      "model"
     ],
     "fileServicePath": [
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/DATAFILES",
@@ -116,6 +148,9 @@
     ]
   },
   "dataManagerLog": {
+    "dependencies": [
+      "model"
+    ],
     "fileServicePath": [
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/MACROFILES",
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/MACROFILES",
@@ -127,18 +162,21 @@
     ]
   },
   "dataManagerModeling": {
+    "dependencies": [
+      "model"
+    ],
     "tables": [
       "UJD_INSTRUCTION2",
       "UJD_LINK",
       "UJD_PACKAGES2",
       "UJD_PACKAGEST2",
       "UJD_PACKAGE_LINK"
-    ],
-    "dependencies": [
-      "modeling"
-    ]
+    ]   
   },
   "dataManagerTransFile": {
+    "dependencies": [
+      "model"
+    ],
     "fileServicePath": [
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/CONVERSIONFILES",
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/TRANSFORMATIONFILES",
@@ -146,9 +184,6 @@
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/TRANSFORMATIONFILES",
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/CONVERSIONFILES",
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/TRANSFORMATIONFILES"
-    ],
-    "dependencies": [
-      "dataManagerModeling"
     ]
   },
   "dimension": {
@@ -177,15 +212,16 @@
     ]
   },
   "excelClient": {
+    "dependencies": [
+      "model",
+      "fileService"
+    ],
     "fileServicePath": [
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/INPUT SCHEDULES",
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/PDBOOKS",
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/REPORTS",
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/EEXCEL/INPUT SCHEDULES",
       "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/EEXCEL/REPORTS"
-    ],
-    "dependencies": [
-      "fileService"
     ]
   },
   "fileService": {
@@ -198,16 +234,22 @@
     ]
   },
   "journalData": {
+    "dependencies": [
+      "model"     
+    ],
     "folder": [
       "Comments.Audit.Journals/{applId}/JOURNAL_DETAIL"
     ]
   },
   "masterData": {
     "dependencies": [
-      "modeling"
+      "model"
     ]
   },
   "model": {
+    "dependencies": [
+      "environment"     
+    ],
     "tables": [
       "UJ0_PARAM_APP",
       "UJA_APPL",
@@ -228,6 +270,9 @@
     ]
   },
   "others": {
+    "dependencies": [
+      "model"
+    ],
     "tables": [
       "UJA_LOGGED_ON",
       "UJA_USAGE_LOG",
@@ -236,6 +281,9 @@
     ]
   },
   "persistenceResource": {
+    "dependencies": [
+      "environment"
+    ],
     "tables": [
       "UJPS_ALIAS",
       "UJPS_RESOURCE",
@@ -245,16 +293,25 @@
     ]
   },
   "scriptLogic": {
+    "dependencies": [
+      "model"
+    ],
     "fileServicePath": [
       "ROOT/WEBFOLDERS/{originalAppsetId}/ADMINAPP/{applId}"
     ]
   },
   "taskProfile": {
+    "dependencies": [
+      "environment"
+    ],
     "tables": [
       "UJE_PROFILE_AGR"
     ]
   },
   "team": {
+    "dependencies": [
+      "environment"
+    ],
     "tables": [
       "UJE_TEAM_AGR",
       "UJE_TEAM_MULTAGR"
@@ -262,14 +319,19 @@
   },
   "transactionData": {
     "dependencies": [
-      "modeling",
+      "model",
       "masterData"
     ]
   },
   "user": {
+    "dependencies": [
+      "environment"
+    ],
     "tables": [
       "UJE_USER_AGR"
     ]
   },
-  "workstatusLock": {}
+  "workstatusLock": {
+    
+  }
 }

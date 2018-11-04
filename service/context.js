@@ -10,6 +10,9 @@ var oComponentConfig = null;
 var oGroupConfig = null;
 var oAppset = {};
 
+var parseAppsetRoot = function(config, oResult){
+};
+
 var parseXMLInfo = function(config, oResult){
 	sAppsetName = oResult.AppsetData.$.APPSET_ID;
     console.log("appsetId is :" + sAppsetName);

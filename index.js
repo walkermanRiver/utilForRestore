@@ -30,7 +30,27 @@ function cleanTempFiles(sOutPutFolder){
 let sOutPutXMLFolder = getTempFolder();
 let sSourceXMLFile = getSourceXMLFile();
 cleanTempFiles(sOutPutXMLFolder);
-metaDataProcessor.preProcessSoureFile(sSourceXMLFile,sOutPutXMLFolder);
+// metaDataProcessor.preProcessSoureFile(sSourceXMLFile,sOutPutXMLFolder);
+
+metaDataProcessor.preProcessSoureFilePromise(sSourceXMLFile,sOutPutXMLFolder)
+	.then(()=> metaDataProcessor.getAppsetPromise())
+	.then(()=> metaDataProcessor.filterTablesPromise())
+	.then(()=> metaDataProcessor.generateNewMetadataPromise())
+	.then(oResult=> console.log(oResult))
+	.catch(error => console.log(error));
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // var sSourceFileName = __dirname + '/testFile.xml';
 
@@ -54,7 +74,15 @@ metaDataProcessor.preProcessSoureFile(sSourceXMLFile,sOutPutXMLFolder);
 //     console.log("done");
 //   });
 
-// fs.readFile(__dirname + '/exampleData/Metadata.xml', function(err, data) {
+
+
+
+
+// var fs = require('fs');
+// var xml2js = require('xml2js');
+// var sSourceFileName = __dirname + '/tempFolder/chunk5.xml';
+// var parser = new xml2js.Parser();
+// fs.readFile(sSourceFileName, function(err, data) {
 // // fs.readFile(__dirname + '/testFile.xml', function(err, data) {
 //     parser.parseString(data, function (err, oResult) {
 //         if(err){
@@ -62,25 +90,25 @@ metaDataProcessor.preProcessSoureFile(sSourceXMLFile,sOutPutXMLFolder);
 //             return;
 //         }
 
-//         let oOriTables = context.parseXMLInfo(config, oResult); 
+//         // let oOriTables = context.parseXMLInfo(config, oResult); 
 
-//         //clear memory
-//         oResult = null;
+//         // //clear memory
+//         // oResult = null;
 
-//         oTableNames =  context.getTableList();
-//         for(sTableName in oTableNames){
-//             let aNewRows = context.formatJson(oOriTables[sTableName]);
-//             if(!aNewRows || aNewRows.length === 0){
-//                 console.log("Skip table " + sTableName + " when format data!");
-//                 continue;
-//             }
-//             let sTableContent = JSON.stringify(aNewRows); 
-//             fs.writeFileSync (sOutPutFolder + '/' + sTableName + ".json", sTableContent); 
+//         // oTableNames =  context.getTableList();
+//         // for(sTableName in oTableNames){
+//         //     let aNewRows = context.formatJson(oOriTables[sTableName]);
+//         //     if(!aNewRows || aNewRows.length === 0){
+//         //         console.log("Skip table " + sTableName + " when format data!");
+//         //         continue;
+//         //     }
+//         //     let sTableContent = JSON.stringify(aNewRows); 
+//         //     fs.writeFileSync (sOutPutFolder + '/' + sTableName + ".json", sTableContent); 
 
-//             //clear memory 
-//             delete oOriTables[sTableName];
-//         }
-//         console.log("All the DDIC files are saved seperately!");
+//         //     //clear memory 
+//         //     delete oOriTables[sTableName];
+//         // }
+//         // console.log("All the DDIC files are saved seperately!");
 
 // 		console.log('Done');
 //     });
