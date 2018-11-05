@@ -253,11 +253,11 @@ const getAppsetPromise = () => {
     });
 };
 
-function filterFileServiceEntries = function(){
+function filterFileServiceEntries(){
 
 }
 
-function filterPersistenceEntries = function(){
+function filterPersistenceEntries(){
 	
 }
 

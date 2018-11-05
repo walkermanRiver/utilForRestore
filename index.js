@@ -33,9 +33,9 @@ cleanTempFiles(sOutPutXMLFolder);
 // metaDataProcessor.preProcessSoureFile(sSourceXMLFile,sOutPutXMLFolder);
 
 metaDataProcessor.preProcessSoureFilePromise(sSourceXMLFile,sOutPutXMLFolder)
-	.then(()=> metaDataProcessor.getAppsetPromise())
-	.then(()=> metaDataProcessor.filterTablesPromise())
-	.then(()=> metaDataProcessor.generateNewMetadataPromise())
+	// .then(()=> metaDataProcessor.getAppsetPromise())
+	// .then(()=> metaDataProcessor.filterTablesPromise())
+	// .then(()=> metaDataProcessor.generateNewMetadataPromise())
 	.then(oResult=> console.log(oResult))
 	.catch(error => console.log(error));
 
