@@ -6,5 +6,19 @@
 	},
 	"SPLITROWCOUNT": 20000,
 	"SPLITCONTENTlENGTH": 10485760,
-	"BIGROWSIZE": 10485760
+	"BIGROWSIZE": 10485760,
+	"OBJKEY": "KEY",
+	"OBJID": "ID",
+	"FILEPATHVARIABLE":{
+		"APPSETID":"%APPSETID%",
+		"APPLID": "%APPLID%",
+		"TEAMID": "%TEAMID%",
+		"USERID": "%USERID%"
+	},
+	"REGEXPELEMENT":{
+		"APPSETID":"([^\\s]+)",
+		"APPLID": "([^\\s]+)",
+		"TEAMID": "([^\\s]+)",
+		"USERID": "([^\\s]+)"
+	}
 }

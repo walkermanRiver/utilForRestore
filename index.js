@@ -115,5 +115,9 @@ metaDataProcessor.preProcessSoureFilePromise(sSourceXMLFile,sOutPutXMLFolder)
 // });
 
 
+var str = '\\ROOT\\WEBFOLDERS\\environment\\planning\\EEXCEL\\BOOKS\\load';
+var pattern = /\\ROOT\\WEBFOLDERS\\([a-z]+)\\([a-z]+)\\EEXCEL\\BOOKS\\([a-z]+)/;
+var pattern = /\\ROOT\\WEBFOLDERS\\([^\s]+)\\([^\s]+)\\EEXCEL\\BOOKS\\/;
 
-
+pattern.test(str);
+RegExp.$1

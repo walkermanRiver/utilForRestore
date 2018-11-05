@@ -17,7 +17,7 @@
       "fileService"
     ],
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/BOOKS"
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\EEXCEL\\BOOKS"
     ],
     "tables": [
       "UJZ_BOOK_INFO",
@@ -100,7 +100,7 @@
       "model"     
     ],
     "folder": [
-      "Comments.Audit.Journals/{applId}/COMMENT"
+      "Comments.Audit.Journals/%applId%/COMMENT"
     ]
   },
   "consolidationData": {
@@ -142,9 +142,9 @@
       "model"
     ],
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/DATAFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/DATAFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/DATAFILES"
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\DATAMANAGER\\DATAFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\PRIVATEPUBLICATIONS\\%userId%\\DATAMANAGER\\DATAFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\TEAM FILES\\%teamId%\\DATAMANAGER\\DATAFILES"
     ]
   },
   "dataManagerLog": {
@@ -152,13 +152,13 @@
       "model"
     ],
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/MACROFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/MACROFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/MACROFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/SELECTIONFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/SELECTIONFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/SELECTIONFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/tempfiles"
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\DATAMANAGER\\MACROFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\TEAM FILES\\%teamId%\\DATAMANAGER\\MACROFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\PRIVATEPUBLICATIONS\\%userId%\\DATAMANAGER\\MACROFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\DATAMANAGER\\SELECTIONFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\PRIVATEPUBLICATIONS\\%userId%\\DATAMANAGER\\SELECTIONFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\TEAM FILES\\%teamId%\\DATAMANAGER\\SELECTIONFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\PRIVATEPUBLICATIONS\\%userId%\\tempfiles"
     ]
   },
   "dataManagerModeling": {
@@ -178,17 +178,17 @@
       "model"
     ],
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/CONVERSIONFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/DATAMANAGER/TRANSFORMATIONFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/CONVERSIONFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/PRIVATEPUBLICATIONS/{userId}/DATAMANAGER/TRANSFORMATIONFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/CONVERSIONFILES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/DATAMANAGER/TRANSFORMATIONFILES"
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\DATAMANAGER\\CONVERSIONFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\DATAMANAGER\\TRANSFORMATIONFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\PRIVATEPUBLICATIONS\\%userId%\\DATAMANAGER\\CONVERSIONFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\PRIVATEPUBLICATIONS\\%userId%\\DATAMANAGER\\TRANSFORMATIONFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\TEAM FILES\\%teamId%\\DATAMANAGER\\CONVERSIONFILES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\TEAM FILES\\%teamId%\\DATAMANAGER\\TRANSFORMATIONFILES"
     ]
   },
   "dimension": {
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/{originalAppsetId}/ADMINAPP/DIMENSION FORMULA"
+      "ROOT\\WEBFOLDERS\\%appsetId%\\ADMINAPP\\DIMENSION FORMULA"
     ],
     "tables": [
       "UJA_DIMENSION",
@@ -200,8 +200,8 @@
   },
   "documents": {
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/{originalAppsetId}/DOCUMENTS",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/DOCUMENTS_STAGING"
+      "ROOT\\WEBFOLDERS\\%appsetId%\\DOCUMENTS",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\DOCUMENTS_STAGING"
     ]
   },
   "environment": {
@@ -217,16 +217,16 @@
       "fileService"
     ],
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/INPUT SCHEDULES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/PDBOOKS",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/EEXCEL/REPORTS",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/EEXCEL/INPUT SCHEDULES",
-      "ROOT/WEBFOLDERS/{originalAppsetId}/{applId}/TEAM FILES/{teamId}/EEXCEL/REPORTS"
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\EEXCEL\\INPUT SCHEDULES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\EEXCEL\\PDBOOKS",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\EEXCEL\\REPORTS",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\TEAM FILES\\%teamId%\\EEXCEL\\INPUT SCHEDULES",
+      "ROOT\\WEBFOLDERS\\%appsetId%\\%applId%\\TEAM FILES\\%teamId%\\EEXCEL\\REPORTS"
     ]
   },
   "fileService": {
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/ADMINTEMPLATES"
+      "ROOT\\WEBFOLDERS\\ADMINTEMPLATES"
     ],
     "tables": [
       "UJF_DOC",
@@ -238,7 +238,7 @@
       "model"     
     ],
     "folder": [
-      "Comments.Audit.Journals/{applId}/JOURNAL_DETAIL"
+      "Comments.Audit.Journals/%applId%/JOURNAL_DETAIL"
     ]
   },
   "masterData": {
@@ -266,7 +266,7 @@
   },
   "obsolete": {
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/{originalAppsetId}/SCRATCHREPOSITORY"
+      "ROOT\\WEBFOLDERS\\%appsetId%\\SCRATCHREPOSITORY"
     ]
   },
   "others": {
@@ -297,7 +297,7 @@
       "model"
     ],
     "fileServicePath": [
-      "ROOT/WEBFOLDERS/{originalAppsetId}/ADMINAPP/{applId}"
+      "ROOT\\WEBFOLDERS\\%appsetId%\\ADMINAPP\\%applId%"
     ]
   },
   "taskProfile": {

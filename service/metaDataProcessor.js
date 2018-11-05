@@ -257,6 +257,56 @@ function filterFileServiceEntries(){
 
 }
 
+function generateRegExpServicePath(sPath){
+	let sUpCasePath = sPath.toUpperCase();
+	let aVariables = [];
+	let oBPCObj = {};
+	oBPCObj[operateCons.OBJKEY] = 
+		sUpCasePath.search(operateCons.FILEPATHVARIABLE.APPSETID);
+	oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.APPSETID;
+	aVariables.push(oBPCObj);
+
+	oBPCObj = {};
+	oBPCObj[operateCons.OBJKEY] = 
+		sUpCasePath.search(operateCons.FILEPATHVARIABLE.APPLID);
+	oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.APPLID;
+	aVariables.push(oBPCObj);
+
+	oBPCObj = {};
+	oBPCObj[operateCons.OBJKEY] = 
+		sUpCasePath.search(operateCons.FILEPATHVARIABLE.TEAMID);
+	oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.TEAMID;
+	aVariables.push(oBPCObj);
+
+	oBPCObj = {};
+	oBPCObj[operateCons.OBJKEY] = 
+		sUpCasePath.search(operateCons.FILEPATHVARIABLE.USERID);
+	oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.USERID;
+	aVariables.push(oBPCObj);
+
+	aVariables.sort(function(oA, oB){
+		if(oA.OBJKEY < oB.OBJKEY){
+			return -1;
+		}elseif(oA.OBJKEY > oB.OBJKEY){
+			return 1;
+		}else{
+			return 0
+		}
+	})
+
+	var sPattern = sUpCasePath.replace(/\\/g,"\\\\")
+		.replace(operateCons.FILEPATHVARIABLE.APPSETID, operateCons.REGEXPELEMENT.APPSETID)
+		.replace(operateCons.FILEPATHVARIABLE.APPLID, operateCons.REGEXPELEMENT.APPLID)
+		.replace(operateCons.FILEPATHVARIABLE.TEAMID, operateCons.REGEXPELEMENT.TEAMID)
+		.replace(operateCons.FILEPATHVARIABLE.USERID, operateCons.REGEXPELEMENT.USERID);
+
+	var oPattern = new RegExp(sPattern,"i");
+
+	//later consume can use oPattern.test(str) and check if result is true
+	//and then can use RegExp.$1 to get the environment/model value
+	return {"aVariables":aVariables,"oPattern":oPattern};
+}
+
 function filterPersistenceEntries(){
 	
 }
