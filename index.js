@@ -34,7 +34,7 @@ cleanTempFiles(sOutPutXMLFolder);
 
 metaDataProcessor.preProcessSoureFilePromise(sSourceXMLFile,sOutPutXMLFolder)
 	// .then(()=> metaDataProcessor.getAppsetPromise())
-	// .then(()=> metaDataProcessor.filterTablesPromise())
+	// .then(()=> metaDataProcessor.filterMetadataTableEntriesPromise())
 	// .then(()=> metaDataProcessor.generateNewMetadataPromise())
 	.then(oResult=> console.log(oResult))
 	.catch(error => console.log(error));
@@ -80,7 +80,7 @@ metaDataProcessor.preProcessSoureFilePromise(sSourceXMLFile,sOutPutXMLFolder)
 
 // var fs = require('fs');
 // var xml2js = require('xml2js');
-// var sSourceFileName = __dirname + '/tempFolder/chunk5.xml';
+// var sSourceFileName = __dirname + '/exampleData/Metadata.xml';
 // var parser = new xml2js.Parser();
 // fs.readFile(sSourceFileName, function(err, data) {
 // // fs.readFile(__dirname + '/testFile.xml', function(err, data) {
@@ -115,9 +115,9 @@ metaDataProcessor.preProcessSoureFilePromise(sSourceXMLFile,sOutPutXMLFolder)
 // });
 
 
-var str = '\\ROOT\\WEBFOLDERS\\environment\\planning\\EEXCEL\\BOOKS\\load';
-var pattern = /\\ROOT\\WEBFOLDERS\\([a-z]+)\\([a-z]+)\\EEXCEL\\BOOKS\\([a-z]+)/;
-var pattern = /\\ROOT\\WEBFOLDERS\\([^\s]+)\\([^\s]+)\\EEXCEL\\BOOKS\\/;
+// var str = '\\ROOT\\WEBFOLDERS\\environment\\planning\\EEXCEL\\BOOKS\\load';
+// var pattern = /\\ROOT\\WEBFOLDERS\\([a-z]+)\\([a-z]+)\\EEXCEL\\BOOKS\\([a-z]+)/;
+// var pattern = /\\ROOT\\WEBFOLDERS\\([^\s]+)\\([^\s]+)\\EEXCEL\\BOOKS\\/;
 
-pattern.test(str);
-RegExp.$1
+// pattern.test(str);
+// RegExp.$1

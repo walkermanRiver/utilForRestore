@@ -253,41 +253,117 @@ const getAppsetPromise = () => {
     });
 };
 
-function filterFileServiceEntries(){
+function filterUJDOCEntries(){
 
+}
+
+function filterUJDOCTreeEntries(oContext,oTableContent){
+	// let oMapTableChunk = oContext.getTableMapping();
+	// let aChunk = oMapTableChunk["UJF_DOCTREE"];
+	// let iCount = aChunk.length;
+	// for(let iIndex=0; iIndex<iCount; iIndex++){
+	// 	sChunkFileName = sOutPutFolder + aChunk[iIndex] + '.xml';
+		
+	// }
+}
+
+function generateCompFilePattern(oValidComponent){
+	var componentConfig = require('./config/componentConfig.json');
+
+	for(sComName in oValidComponent){
+		if(componentConfig[sComName].hasOwnProperty("fileServicePath")){
+			oValidComponent[sComName]["fileServiceRegExp"] = generateRegExpServicePath(componentConfig[sComName]["fileServicePath"]);
+		}
+	}
+
+	return oValidComponent;
+}
+
+function validateSingleFileServiceEntry(oValidComponent, sFilePath, oContext){
+	let bEntryFound = false;
+	for(sComName in oValidComponent){
+		if(oValidComponent[sComName].hasOwnProperty("fileServiceRegExp")){
+			let oPattern = oValidComponent[sComName]["fileServiceRegExp"]["oPattern"];
+			if(oPattern.test(sFilePath) === true){
+				bEntryFound = true;
+				let aVariables = oValidComponent[sComName]["fileServiceRegExp"]["aVariables"];
+				let iCount = aVariables.length;
+				for(let iIndex=0; iIndex<iCount; iIndex++){
+					let oVariable = aVariables[iIndex];
+					let sValue = RegExp["$" + (iIndex + 1)];
+					switch(oVariable[operateCons.OBJID]){
+						case operateCons.FILEPATHVARIABLE.APPSETID:
+							//validate if appsetId equals sValue;
+							break;
+						case operateCons.FILEPATHVARIABLE.APPLID:
+							//validate if the applid which equals sValue is in the appset
+							break;
+						case operateCons.FILEPATHVARIABLE.TEAMID:
+							//validate if the teamId which equals sValue is in the appset
+							break;
+						case operateCons.FILEPATHVARIABLE.USERID:
+							//validate if the userId which equals sValue is in the appset
+							break;
+						default:
+
+					}
+				}
+				break;			
+			}			
+		}
+	}
+
+	//the file path has no valid file path pattern
+	if(bEntryFound === false){
+		return false;
+	}else{
+		return true;
+	}
 }
 
 function generateRegExpServicePath(sPath){
 	let sUpCasePath = sPath.toUpperCase();
 	let aVariables = [];
 	let oBPCObj = {};
-	oBPCObj[operateCons.OBJKEY] = 
-		sUpCasePath.search(operateCons.FILEPATHVARIABLE.APPSETID);
-	oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.APPSETID;
-	aVariables.push(oBPCObj);
+	let iPos = null;
+	iPos = sUpCasePath.search(operateCons.FILEPATHVARIABLE.APPSETID);
+	if(iPos >= 0){
+		oBPCObj[operateCons.OBJKEY] = iPos;
+		oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.APPSETID;
+		aVariables.push(oBPCObj);
+	}
+	
+	
 
 	oBPCObj = {};
-	oBPCObj[operateCons.OBJKEY] = 
-		sUpCasePath.search(operateCons.FILEPATHVARIABLE.APPLID);
-	oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.APPLID;
-	aVariables.push(oBPCObj);
+	iPos = sUpCasePath.search(operateCons.FILEPATHVARIABLE.APPLID);
+	if(iPos >= 0){
+		oBPCObj[operateCons.OBJKEY] = iPos;
+		oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.APPLID;
+		aVariables.push(oBPCObj);
+	}
 
 	oBPCObj = {};
-	oBPCObj[operateCons.OBJKEY] = 
-		sUpCasePath.search(operateCons.FILEPATHVARIABLE.TEAMID);
-	oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.TEAMID;
-	aVariables.push(oBPCObj);
+	iPos = sUpCasePath.search(operateCons.FILEPATHVARIABLE.TEAMID);
+	if(iPos >= 0){
+		oBPCObj[operateCons.OBJKEY] = iPos;
+		oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.TEAMID;
+		aVariables.push(oBPCObj);
+	}
+	
 
 	oBPCObj = {};
-	oBPCObj[operateCons.OBJKEY] = 
-		sUpCasePath.search(operateCons.FILEPATHVARIABLE.USERID);
-	oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.USERID;
-	aVariables.push(oBPCObj);
+	iPos = sUpCasePath.search(operateCons.FILEPATHVARIABLE.USERID);
+	if(iPos >= 0){
+		oBPCObj[operateCons.OBJKEY] = iPos;
+		oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.USERID;
+		aVariables.push(oBPCObj);
+	}	
 
 	aVariables.sort(function(oA, oB){
 		if(oA.OBJKEY < oB.OBJKEY){
 			return -1;
-		}elseif(oA.OBJKEY > oB.OBJKEY){
+		}else if(oA.OBJKEY > oB.OBJKEY){
 			return 1;
 		}else{
 			return 0
@@ -311,17 +387,33 @@ function filterPersistenceEntries(){
 	
 }
 
-function filterTablesPromise(){
+function filterMetadataTableEntriesPromise(){
+	processBasicMetadata()
+	.then(()=>processNormalMetadata());	
+}
+
+function processBasicMetadata(){
+	return new Promise((resolve, reject) => {
+		let oAppsetInfo = context.oAppset;		
+		let oMapTableChunk = oContext.getTableMapping();
+		//will handle UJA_DIMENSION,UJA_APPL,UJE_TEAM_AGR,UJE_TEAM_MULTAGR?,
+		let aChunk = oMapTableChunk["UJA_DIMENSION"];
+		let iCount = aChunk.length;
+		for(let iIndex=0; iIndex<iCount; iIndex++){
+			sChunkFileName = sOutPutFolder + aChunk[iIndex] + '.xml';
+			
+		}
+
+	})
+}
+
+function processNormalMetadata(){
 	return new Promise((resolve, reject) => {
 
 	})
 }
 
-function filterTablesPromise(){
-	return new Promise((resolve, reject) => {
-		
-	})
-}
+
 
 function generateNewMetadataPromise(){
 	return new Promise((resolve, reject) => {
