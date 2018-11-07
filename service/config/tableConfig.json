@@ -1,0 +1,16 @@
+{
+  "UJA_APPL": {	  	
+  		"primaryKeys": [
+	  		{
+	  			"column": "MANDT",
+	  		}  		
+	  	],
+	  	"foreignKeys":[
+	  		{
+	  			"column": "",
+	  			"referenceTable": "UJA_APPSETT",
+	  			"referenceColumn": ""
+	  		}
+	  	]			
+  	}
+}
