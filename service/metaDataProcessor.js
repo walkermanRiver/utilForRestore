@@ -388,30 +388,199 @@ function filterPersistenceEntries(){
 }
 
 function filterMetadataTableEntriesPromise(){
-	processBasicMetadata()
-	.then(()=>processNormalMetadata());	
+
+	let sOutputXMLFile = getResultXMLFile();
+	let sRejectDataPath = getRejectDataPath();
+	//we have got all the valid tables in one object oTableChunkMap
+	var oPromiseFilter = Promise.resolve();
+	
+	oPromiseFilter = oPromiseFilter.then(() => {
+		preOutputXMLFile(sOutputXMLFile);
+	});
+
+	while(hasNextTable()){
+		let sTableName = getNextTableName();
+		
+		oPromiseFilter = oPromiseFilter.then((sTableName) => {
+			filterSingleTable(sTableName, sOutputXMLFile, sRejectDataPath);
+		});
+	}
+
+	oPromiseFilter = oPromiseFilter.then(() => {
+		postOutputXMLFile(sOutputXMLFile);
+	});
+	
+	return oPromiseFilter;
 }
 
-function processBasicMetadata(){
-	return new Promise((resolve, reject) => {
-		let oAppsetInfo = context.oAppset;		
-		let oMapTableChunk = oContext.getTableMapping();
-		//will handle UJA_DIMENSION,UJA_APPL,UJE_TEAM_AGR,UJE_TEAM_MULTAGR?,
-		let aChunk = oMapTableChunk["UJA_DIMENSION"];
-		let iCount = aChunk.length;
-		for(let iIndex=0; iIndex<iCount; iIndex++){
-			sChunkFileName = sOutPutFolder + aChunk[iIndex] + '.xml';
-			
+function filterSingleTable(sTableName, sOutputXMLFile, sRejectDataPath){	
+	
+	let sOutputTableFile = getTableResultFileName(sTableName);
+	let sRejectDataFile = getRejectDataTableFileName(sTableName,sRejectDataPath);
+	let aChunk = getTableChunk(sTableName);	
+
+	var oPromiseFilter = Promise.resolve();
+	oPromiseFilter = oPromiseFilter.then(() => {
+		preOutputTableFile(sTableName,sOutputTableFile, sRejectDataFile);
+	});
+
+	oPromiseFilter = oPromiseFilter.then(() => {
+		aChunk.reduce((promise, iChunk) => promise.then(() => filterSingleTableFile(sTable, iChunk, sOutputTableFile, sRejectDataFile)), Promise.resolve());
+	});
+
+	oPromiseFilter = oPromiseFilter.then(() => {
+		postOutputTableFile(sTableName,sOutputTableFile, sRejectDataFile);
+	});
+	
+	return oPromiseFilter;
+	
+
+
+		// let iChunkCount = aChunk.length;
+		// for(let iChunIndex=0;)
+
+		// while(getNextChunkFileName(sTable, iChunk)){
+		// 	oPromiseFilter = oPromiseFilter.then((sTable,iChunk) => filterSingleTableFile(sTable,iChunk));
+		// }
+	
+
+	// gitFirstTable().then => getChunkFileNames() => for()
+
+	// processBasicMetadata()
+	// .then(()=>processNormalMetadata());	
+}
+
+function filterSingleTableFile(sTableName,iChunk,sValidOutputTableFile, sRejectOutputTableFile){
+	let sSourceTableFileName = getStagingTableFile(sTableName,iChunk);	
+	readFile(sSourceTableFileName)
+	.then((err, sFileContent) => {
+		//check error;
+		parseXMLData(sFileContent);
+	})
+	.then((oJsonData) => {
+		let aTableData = oJsonData[sTable];		
+		let oResultData = filterSingleTableEntries(sTableName,aTableData);
+		let aValidData = oResultData["validData"];
+		let aRejectData = oResultData["rejectData"];
+		appendValidDataFile(sValidOutputTableFile, aFilteredResult)
+		.then(() => appendRejectDataFile(sRejectOutputTableFile, aRejectData));
+	});	
+}
+
+function filterSingleTableEntries(sTableName, aTableData){
+	if(isSpecialTable(sTableName) === true){
+		return filterSpecialTableEntries(sTableName, aTableData);
+	}else{
+		return filterNormalTableEntries(sTableName, aTableData);		
+	}
+}
+
+function filterNormalTableEntries(sTableName, aTableData){
+	let oTableKeyInfo;
+	let aTableForeignKeys = oTableKeyInfo.foreignKeys;
+	let oResultData = {};
+
+	if(!aTableForeignKeys || aTableForeignKeys.length <= 0){
+		//no need to filter data, keep all the data
+		oResultData["validData"] = aTableData;
+		return oResultData;
+	}
+
+	let aValidData = [];
+	let aRejectData = [];
+	let iKeyCount = aTableForeignKeys.length;
+	let oReferenceTableColumn = {};
+	let oReferenceTableColumnValue,sTableColumnKey;
+	aTableForeignKeys.forEach(function(oForeignKey){
+		//use object to act as hash
+		oReferenceTableColumnValue = getValidColumnValue(oForeignKey.referenceTable, oForeignKey.referenceColumn);
+		sTableColumnKey = generateTableColumnKey(oForeignKey.referenceTable,oForeignKey.referenceColumn);
+		oReferenceTableColumn[sTableColumnKey] = oReferenceTableColumnValue;		
+	});
+
+	let bRowValid = true;
+	let oRow = null;
+	for(let iRowIndex=0, iCount = aTableData.length; iRowIndex<iCount; iRowIndex++){
+		bRowValid = true;
+		oRow = aTableData[iRowIndex];
+		for(let iKeyIndex=0; iKeyIndex<iKeyCount; iKeyIndex++){
+			oTableKey = aTableForeignKeys[iKeyIndex];
+			let sColValue = oRow[oTableKey.column];
+			let sReferenceTableColumnKey = generateTableColumnKey(oTableKey.referenceTable, oTableKey.referenceColumn);
+			bRowValid = oReferenceTableColumn[sReferenceTableColumnKey][sColValue];
+			if(!bRowValid){
+				break;
+			}
 		}
+		if(bRowValid){
+			aValidData.push(oRow);
+		}else{
+			aRejectData.push(oRow);
+		}
+	}
 
-	})
+	oResultData["validData"] = aValidData;
+	oResultData["rejectData"] = aRejectData;
+
+	return oResultData;
 }
 
-function processNormalMetadata(){
-	return new Promise((resolve, reject) => {
+function filterSpecialTableEntries(sTableName, aTableData){
+	//we should have special handling for file service, persistence table
+	switch(sTableName){
+		case "UJF_DOC":
+			break;
+		case "UJF_DOCTREE";
+			break;
+		case "UJPS_RESOURCE";
+			break;
+		default:		
+	}
 
-	})
 }
+
+function filterFileServiceDocEntries(sTableName, aTableData){
+	var oValidFilePattern = getValidFileServicePattern();
+	let oRow = null;
+	for(let iRowIndex=0, iRowCount=aTableData.length; iRowIndex<iRowCount; iRowIndex++){
+		oRow = aTableData[iRowIndex];
+		let sDocName = oRow["DOCNAME"];
+		//check pattern
+		//get depended table key column value:( appset, appl, team, user)
+		//check if dependent column value exist
+		
+	}
+}
+
+function filterFileServiceDocTreeEntries(sTableName, aTableData){
+	var oValidFilePattern = getValidFileServicePattern();
+	let oRow = null;
+	for(let iRowIndex=0, iRowCount=aTableData.length; iRowIndex<iRowCount; iRowIndex++){
+		oRow = aTableData[iRowIndex];
+		
+	}
+}
+
+// function processBasicMetadata(){
+// 	return new Promise((resolve, reject) => {
+// 		let oAppsetInfo = context.oAppset;		
+// 		let oMapTableChunk = oContext.getTableMapping();
+// 		//will handle UJA_DIMENSION,UJA_APPL,UJE_TEAM_AGR,UJE_TEAM_MULTAGR?,
+// 		let aChunk = oMapTableChunk["UJA_DIMENSION"];
+// 		let iCount = aChunk.length;
+// 		for(let iIndex=0; iIndex<iCount; iIndex++){
+// 			sChunkFileName = sOutPutFolder + aChunk[iIndex] + '.xml';
+			
+// 		}
+
+// 	})
+// }
+
+// function processNormalMetadata(){
+// 	return new Promise((resolve, reject) => {
+
+// 	})
+// }
 
 
 
