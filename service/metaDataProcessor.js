@@ -398,6 +398,10 @@ function filterMetadataTableEntriesPromise(){
 		preOutputXMLFile(sOutputXMLFile);
 	});
 
+	// oPromiseFilter = oPromiseFilter.then(() => {
+	// 	scanToCollectSpeicalTableInfo();
+	// });
+
 	while(hasNextTable()){
 		let sTableName = getNextTableName();
 		
@@ -478,6 +482,57 @@ function filterSingleTableEntries(sTableName, aTableData){
 function filterNormalTableEntries(sTableName, aTableData){
 	let oTableKeyInfo;
 	let aTableForeignKeys = oTableKeyInfo.foreignKeys;
+	return validateRowForeigns(aTableData, aTableForeignKeys);
+
+	// let oResultData = {};
+
+	// if(!aTableForeignKeys || aTableForeignKeys.length <= 0){
+	// 	//no need to filter data, keep all the data
+	// 	oResultData["validData"] = aTableData;
+	// 	return oResultData;
+	// }
+
+	// let aValidData = [];
+	// let aRejectData = [];
+	// let iKeyCount = aTableForeignKeys.length;
+	// let oReferenceTableColumn = {};
+	// let oReferenceTableColumnValue,sTableColumnKey;
+	// aTableForeignKeys.forEach(function(oForeignKey){
+	// 	//use object to act as hash
+	// 	oReferenceTableColumnValue = getValidColumnValue(oForeignKey.referenceTable, oForeignKey.referenceColumn);
+	// 	sTableColumnKey = generateTableColumnKey(oForeignKey.referenceTable,oForeignKey.referenceColumn);
+	// 	oReferenceTableColumn[sTableColumnKey] = oReferenceTableColumnValue;		
+	// });
+
+	// let bRowValid = true;
+	// let oRow = null;
+	// for(let iRowIndex=0, iCount = aTableData.length; iRowIndex<iCount; iRowIndex++){
+	// 	bRowValid = true;
+	// 	oRow = aTableData[iRowIndex];
+	// 	for(let iKeyIndex=0; iKeyIndex<iKeyCount; iKeyIndex++){
+	// 		oTableKey = aTableForeignKeys[iKeyIndex];
+	// 		let sColValue = oRow[oTableKey.column];
+	// 		let sReferenceTableColumnKey = generateTableColumnKey(oTableKey.referenceTable, oTableKey.referenceColumn);
+	// 		bRowValid = oReferenceTableColumn[sReferenceTableColumnKey][sColValue];
+	// 		if(!bRowValid){
+	// 			break;
+	// 		}
+	// 	}
+	// 	if(bRowValid){
+	// 		aValidData.push(oRow);
+	// 	}else{
+	// 		aRejectData.push(oRow);
+	// 	}
+	// }
+
+	// oResultData["validData"] = aValidData;
+	// oResultData["rejectData"] = aRejectData;
+
+	// return oResultData;
+}
+
+function validateTableDataForeigns(aTableData,  aTableForeignKeys){
+
 	let oResultData = {};
 
 	if(!aTableForeignKeys || aTableForeignKeys.length <= 0){
@@ -487,8 +542,7 @@ function filterNormalTableEntries(sTableName, aTableData){
 	}
 
 	let aValidData = [];
-	let aRejectData = [];
-	let iKeyCount = aTableForeignKeys.length;
+	let aRejectData = [];	
 	let oReferenceTableColumn = {};
 	let oReferenceTableColumnValue,sTableColumnKey;
 	aTableForeignKeys.forEach(function(oForeignKey){
@@ -498,20 +552,17 @@ function filterNormalTableEntries(sTableName, aTableData){
 		oReferenceTableColumn[sTableColumnKey] = oReferenceTableColumnValue;		
 	});
 
+	
+
+	let iKeyCount = aTableForeignKeys.length;
 	let bRowValid = true;
 	let oRow = null;
 	for(let iRowIndex=0, iCount = aTableData.length; iRowIndex<iCount; iRowIndex++){
 		bRowValid = true;
 		oRow = aTableData[iRowIndex];
-		for(let iKeyIndex=0; iKeyIndex<iKeyCount; iKeyIndex++){
-			oTableKey = aTableForeignKeys[iKeyIndex];
-			let sColValue = oRow[oTableKey.column];
-			let sReferenceTableColumnKey = generateTableColumnKey(oTableKey.referenceTable, oTableKey.referenceColumn);
-			bRowValid = oReferenceTableColumn[sReferenceTableColumnKey][sColValue];
-			if(!bRowValid){
-				break;
-			}
-		}
+
+		bRowValid = validateTableRow(oRow, aTableForeignKeys, oReferenceTableColumn);
+		
 		if(bRowValid){
 			aValidData.push(oRow);
 		}else{
@@ -523,6 +574,25 @@ function filterNormalTableEntries(sTableName, aTableData){
 	oResultData["rejectData"] = aRejectData;
 
 	return oResultData;
+
+}
+
+function validateTableRow(oRow,  aTableForeignKeys, oReferenceTableColumn){
+	let iKeyCount = aTableForeignKeys.length;
+	let oTableKey = null;
+	let bRowValid = true;
+		
+	for(let iKeyIndex=0; iKeyIndex<iKeyCount; iKeyIndex++){
+		oTableKey = aTableForeignKeys[iKeyIndex];
+		let sColValue = oRow[oTableKey.column];
+		let sReferenceTableColumnKey = generateTableColumnKey(oTableKey.referenceTable, oTableKey.referenceColumn);
+		bRowValid = oReferenceTableColumn[sReferenceTableColumnKey][sColValue];
+		if(!bRowValid){
+			return false;
+		}
+	}
+	
+	return true;	
 }
 
 function filterSpecialTableEntries(sTableName, aTableData){
@@ -540,26 +610,102 @@ function filterSpecialTableEntries(sTableName, aTableData){
 }
 
 function filterFileServiceDocEntries(sTableName, aTableData){
-	var oValidFilePattern = getValidFileServicePattern();
-	let oRow = null;
-	for(let iRowIndex=0, iRowCount=aTableData.length; iRowIndex<iRowCount; iRowIndex++){
-		oRow = aTableData[iRowIndex];
-		let sDocName = oRow["DOCNAME"];
-		//check pattern
-		//get depended table key column value:( appset, appl, team, user)
-		//check if dependent column value exist
-		
-	}
+	return filterFileServiceEntries(sTableName, "DOC", aTableData);
 }
 
 function filterFileServiceDocTreeEntries(sTableName, aTableData){
-	var oValidFilePattern = getValidFileServicePattern();
+	//TBD it is difficult to check doc hierarchy for big data
+	var oFlteredData = filterFileServiceEntries(sTableName, "DOCNAME", aTableData);
+	var oFlterDataHierarchy = flterFileServiceHierarchy(sTableName, oFlteredData["validData"]);
+
+	var oReulst = {};
+	oReulst["validData"] = oFlterDataHierarchy["validData"];
+	oReulst["rejectData"] = oFlteredData["rejectData"].concat(oFlterDataHierarchy["rejectData"]);
+	return oReulst;
+}
+
+function flterFileServiceHierarchy(sTableName, aTableBatchData){
+	//first sort the table entries based on docname. this is special to file service, but can not be used to persistence
+	//second construct one object whose key is docname, and value is the row index
+	//loop at aTableBatchData, try to find parent folder, 
+		//if parent folder exist
+			//if parent folder is valid
+				//this row is valid
+				//check if there are pending rows depends on current row
+			//else
+				//this row is invalid
+				//check if there are pending rows depends on current row
+			//endif
+		//else
+			//pending current row, the pending row and pending infomation should be cached cross batch, 
+			//if there are too much memory cost, the pending row can be pushed to some temp files and update the corresponding pending infomation
+			//but we should make sure we can get back the rows with pending infomation
+		//endif	
+	//end loop
+
+	//later, in the post process of the table, we should clean the pending infomation , pending rows and pending files
+}
+
+function filterFileServiceEntries(sTableName, sFilePathColumn, aTableData){
+	var aValidFileRegExps = getValidFileServiceRegExp();
+	let iPatternCount = aValidFileRegExps.length;
+	let oPattern = null;
+	let aVariables = null;
+	let oVariable = null;
+	let iVariableCount = null;
+	let sVariableValue = null;
+	let bEntryFound = false;
+	let sDocName = null;
 	let oRow = null;
+	let aTableForeignKeys = [];
+	let bRowValid = false;
+
+	let oResultData = {};
+	let aValidData = [];
+	let aRejectData = [];
+
 	for(let iRowIndex=0, iRowCount=aTableData.length; iRowIndex<iRowCount; iRowIndex++){
 		oRow = aTableData[iRowIndex];
 		
+		bRowValid = false;
+		sDocName = oRow[sFilePathColumn];
+		aTableForeignKeys = [];
+
+		for(let iPatternIndex=0; iPatternIndex<iPatternCount; iPatternIndex++){
+			oPattern = aValidFileRegExps[iPatternIndex]["oPattern"];
+			if(oPattern.test(sDocName) === true){				
+				aVariables = aValidFileRegExps[iPatternIndex]["aVariables"];
+				iVariableCount = aVariables.length;
+				for(let iVariableIndex=0; iVariableIndex<iVariableCount; iVariableIndex++){
+					oVariable = aVariables[iVariableIndex];
+					sVariableValue = RegExp["$" + (iIndex + 1)];
+					let oTableForeignKey = getForeignKeyWithType(oVariable[operateCons.OBJID]);
+					aTableForeignKeys.push(oTableForeignKey);					
+				}
+
+				break;				
+			}
+		}
+
+		if(aTableForeignKeys.length > 0){
+			bRowValid = validateTableRow(oRow,aTableForeignKeys,oReferenceTableColumn);
+			if(bRowValid){
+				aValidData.push(oRow);
+			}else{
+				aRejectData.push(oRow);
+			}
+		}else{
+			aValidData.push(oRow);
+		}
 	}
+
+	oResultData["validData"] = aValidData;
+	oResultData["rejectData"] = aRejectData;
+
+	return oResultData;
 }
+
+
 
 // function processBasicMetadata(){
 // 	return new Promise((resolve, reject) => {
