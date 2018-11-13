@@ -20,5 +20,10 @@
 		"APPLID": "([^\\s]+)",
 		"TEAMID": "([^\\s]+)",
 		"USERID": "([^\\s]+)"
+	},
+	"VALIDATESTATUS":{
+		"VALID": 1,
+		"UNKNOWN": 0,
+		"INVALID": -1
 	}
 }

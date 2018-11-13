@@ -5,7 +5,7 @@ var fs = require('fs'),
     config = require('./configuration'),
     readline = require('readline');
 
-const operateCons = require("./config/constants.json");
+const OPERATECONS = require("./config/constants.json");
 
 // function metaDataProcessor(sSourceFileName, sOutPutFolder){
 // 	this.sSourceFileName = sSourceFileName;
@@ -56,7 +56,7 @@ function preProcessSoureFilePromise(sSourceFileName, sOutPutFolder){
 		    		bStartChunk = false;
 		    		fs.appendFileSync(sChunkFileName, '<Metadata>' + "\n");
 		    	}
-		    	if(iLineNo <= operateCons.SPLITROWCOUNT && iContentCount <= operateCons.SPLITCONTENTlENGTH){
+		    	if(iLineNo <= OPERATECONS.SPLITROWCOUNT && iContentCount <= OPERATECONS.SPLITCONTENTlENGTH){
 		    		if(xmlFileUtil.isNextNewTrunk(line.toString())){
 		    			sTableName = xmlFileUtil.parseTableName(line.toString());
 		    			sCurTableName = sTableName;
@@ -64,7 +64,7 @@ function preProcessSoureFilePromise(sSourceFileName, sOutPutFolder){
 		    		}
 
 		    		//very big row exception handling
-		    		if(line.length > operateCons.BIGROWSIZE){
+		    		if(line.length > OPERATECONS.BIGROWSIZE){
 		    			exceptProcessBigRow(sOutPutFolder,sCurTableName,line);
 		    			return;
 		    		}
@@ -101,7 +101,7 @@ function preProcessSoureFilePromise(sSourceFileName, sOutPutFolder){
 		        	iLineNo = 1;
 		        	iContentCount = 0;
 		        }
-		        if(line.length > operateCons.BIGROWSIZE){
+		        if(line.length > OPERATECONS.BIGROWSIZE){
 	    			exceptProcessBigRow(sOutPutFolder,sCurTableName,line);
 	    			return;
 	    		}
@@ -173,7 +173,7 @@ function preProcessSoureFile(sSourceFileName, sOutPutFolder){
 	    		bStartChunk = false;
 	    		fs.appendFileSync(sChunkFileName, '<Metadata>' + "\n");
 	    	}
-	    	if(iLineNo <= operateCons.SPLITROWCOUNT && iContentCount <= operateCons.SPLITCONTENTlENGTH){
+	    	if(iLineNo <= OPERATECONS.SPLITROWCOUNT && iContentCount <= OPERATECONS.SPLITCONTENTlENGTH){
 	    		if(xmlFileUtil.isNextNewTrunk(line.toString())){
 	    			sTableName = xmlFileUtil.parseTableName(line.toString());
 	    			sCurTableName = sTableName;
@@ -291,17 +291,17 @@ function validateSingleFileServiceEntry(oValidComponent, sFilePath, oContext){
 				for(let iIndex=0; iIndex<iCount; iIndex++){
 					let oVariable = aVariables[iIndex];
 					let sValue = RegExp["$" + (iIndex + 1)];
-					switch(oVariable[operateCons.OBJID]){
-						case operateCons.FILEPATHVARIABLE.APPSETID:
+					switch(oVariable[OPERATECONS.OBJID]){
+						case OPERATECONS.FILEPATHVARIABLE.APPSETID:
 							//validate if appsetId equals sValue;
 							break;
-						case operateCons.FILEPATHVARIABLE.APPLID:
+						case OPERATECONS.FILEPATHVARIABLE.APPLID:
 							//validate if the applid which equals sValue is in the appset
 							break;
-						case operateCons.FILEPATHVARIABLE.TEAMID:
+						case OPERATECONS.FILEPATHVARIABLE.TEAMID:
 							//validate if the teamId which equals sValue is in the appset
 							break;
-						case operateCons.FILEPATHVARIABLE.USERID:
+						case OPERATECONS.FILEPATHVARIABLE.USERID:
 							//validate if the userId which equals sValue is in the appset
 							break;
 						default:
@@ -326,37 +326,37 @@ function generateRegExpServicePath(sPath){
 	let aVariables = [];
 	let oBPCObj = {};
 	let iPos = null;
-	iPos = sUpCasePath.search(operateCons.FILEPATHVARIABLE.APPSETID);
+	iPos = sUpCasePath.search(OPERATECONS.FILEPATHVARIABLE.APPSETID);
 	if(iPos >= 0){
-		oBPCObj[operateCons.OBJKEY] = iPos;
-		oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.APPSETID;
+		oBPCObj[OPERATECONS.OBJKEY] = iPos;
+		oBPCObj[OPERATECONS.OBJID] = OPERATECONS.FILEPATHVARIABLE.APPSETID;
 		aVariables.push(oBPCObj);
 	}
 	
 	
 
 	oBPCObj = {};
-	iPos = sUpCasePath.search(operateCons.FILEPATHVARIABLE.APPLID);
+	iPos = sUpCasePath.search(OPERATECONS.FILEPATHVARIABLE.APPLID);
 	if(iPos >= 0){
-		oBPCObj[operateCons.OBJKEY] = iPos;
-		oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.APPLID;
+		oBPCObj[OPERATECONS.OBJKEY] = iPos;
+		oBPCObj[OPERATECONS.OBJID] = OPERATECONS.FILEPATHVARIABLE.APPLID;
 		aVariables.push(oBPCObj);
 	}
 
 	oBPCObj = {};
-	iPos = sUpCasePath.search(operateCons.FILEPATHVARIABLE.TEAMID);
+	iPos = sUpCasePath.search(OPERATECONS.FILEPATHVARIABLE.TEAMID);
 	if(iPos >= 0){
-		oBPCObj[operateCons.OBJKEY] = iPos;
-		oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.TEAMID;
+		oBPCObj[OPERATECONS.OBJKEY] = iPos;
+		oBPCObj[OPERATECONS.OBJID] = OPERATECONS.FILEPATHVARIABLE.TEAMID;
 		aVariables.push(oBPCObj);
 	}
 	
 
 	oBPCObj = {};
-	iPos = sUpCasePath.search(operateCons.FILEPATHVARIABLE.USERID);
+	iPos = sUpCasePath.search(OPERATECONS.FILEPATHVARIABLE.USERID);
 	if(iPos >= 0){
-		oBPCObj[operateCons.OBJKEY] = iPos;
-		oBPCObj[operateCons.OBJID] = operateCons.FILEPATHVARIABLE.USERID;
+		oBPCObj[OPERATECONS.OBJKEY] = iPos;
+		oBPCObj[OPERATECONS.OBJID] = OPERATECONS.FILEPATHVARIABLE.USERID;
 		aVariables.push(oBPCObj);
 	}	
 
@@ -371,10 +371,10 @@ function generateRegExpServicePath(sPath){
 	})
 
 	var sPattern = sUpCasePath.replace(/\\/g,"\\\\")
-		.replace(operateCons.FILEPATHVARIABLE.APPSETID, operateCons.REGEXPELEMENT.APPSETID)
-		.replace(operateCons.FILEPATHVARIABLE.APPLID, operateCons.REGEXPELEMENT.APPLID)
-		.replace(operateCons.FILEPATHVARIABLE.TEAMID, operateCons.REGEXPELEMENT.TEAMID)
-		.replace(operateCons.FILEPATHVARIABLE.USERID, operateCons.REGEXPELEMENT.USERID);
+		.replace(OPERATECONS.FILEPATHVARIABLE.APPSETID, OPERATECONS.REGEXPELEMENT.APPSETID)
+		.replace(OPERATECONS.FILEPATHVARIABLE.APPLID, OPERATECONS.REGEXPELEMENT.APPLID)
+		.replace(OPERATECONS.FILEPATHVARIABLE.TEAMID, OPERATECONS.REGEXPELEMENT.TEAMID)
+		.replace(OPERATECONS.FILEPATHVARIABLE.USERID, OPERATECONS.REGEXPELEMENT.USERID);
 
 	var oPattern = new RegExp(sPattern,"i");
 
@@ -624,9 +624,109 @@ function filterFileServiceDocTreeEntries(sTableName, aTableData){
 	return oReulst;
 }
 
+function holdFileServiceDocTreeRow(oDocTreeDep, sDocName, oRow){
+
+}
+
 function flterFileServiceHierarchy(sTableName, aTableBatchData){
-	//first sort the table entries based on docname. this is special to file service, but can not be used to persistence
-	//second construct one object whose key is docname, and value is the row index
+	
+	oDocTreeDep = getDocTreeDependency();
+	const sColName = "DOCNAME";
+	const sParentColName = "PARENTDOC";
+	let iRowCount = aTableBatchData.length;
+	let oResult = {};
+	let aValidData = [];
+	let aRejectData = [];
+	let oDependencyResult = null;
+
+	//first sort the table entries based on docname. this is special to file service, but can not be used to persistence	
+	aTableBatchData.sort(function(oRowA, oRowB){
+		if (oRowA[sColName] < oRowB[sColName] ) {
+		    return -1;
+		}
+		if (oRowA[sColName] > oRowB[sColName] ) {
+		    return 1;
+		}		
+		return 0;		
+	});
+	
+	//oDocTreeDep={"docName:{status:1, aDependency["docName1", "docName2"]}"}
+	for(let iRowIndex=0; iRowIndex<iRowCount; iRowIndex++){
+		let oRow = aTableBatchData[iRowIndex];
+		let sCurDoc = oRow[sColName]
+		let sParentDoc = oRow[sParentColName];
+		let bHasParent = sParentDoc ? true : false;
+		if(bHasParent && oDocTreeDep.hasOwnProperty(sParentDoc)){
+			let sParentStatus = oDocTreeDep[sParentDoc].status;
+			if(oDocTreeDep.hasOwnProperty(sCurDoc)){
+				oDocTreeDep[sCurDoc].status = sParentStatus;
+				if(sParentStatus === OPERATECONS.VALIDATESTATUS.UNKNOWN){
+					holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
+				}else{
+					if(oDocTreeDep[sCurDoc].aDependency.length > 0){
+						oDependencyResult = validateDocTreeDependency(oDocTreeDep, oDocTreeDep[sCurDoc].aDependency, sParentStatus);
+						copyArrayElement(aValidData,oDependencyResult["validData"]);
+						copyArrayElement(aRejectData, oDependencyResult["rejectData"]);
+					}
+				}					
+			}else{
+				oDocTreeDep[sCurDoc] = {
+					status: sParentStatus, 
+					aDependency: []						
+				};
+				switch(sParentStatus){
+					case OPERATECONS.VALIDATESTATUS.VALID:
+						aValidData.push(oRow);
+						break;
+					case OPERATECONS.VALIDATESTATUS.UNKNOWN:
+						holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
+						break;
+					case OPERATECONS.VALIDATESTATUS.INVALID:
+						aRejectData.push(oRow);
+						break;
+				}
+			}
+		}else{			
+			
+			if(bHasParent){
+				oDocTreeDep[sParentDoc] = {
+					status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
+					aDependency: [sCurDoc]						
+				};
+
+				if(oDocTreeDep.hasOwnProperty(sCurDoc)){
+					//nothing change
+				}else{
+					oDocTreeDep[sCurDoc] = {
+						status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
+						aDependency: []						
+					};
+				}
+				holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
+			}else{
+				if(oDocTreeDep.hasOwnProperty(sCurDoc)){
+					oDocTreeDep[sCurDoc].status = OPERATECONS.VALIDATESTATUS.VALID;
+					aValidData.push(oRow);
+					if(oDocTreeDep[sCurDoc].aDependency.length > 0){
+						oDependencyResult = validateDocTreeDependency(oDocTreeDep, oDocTreeDep[sCurDoc].aDependency, OPERATECONS.VALIDATESTATUS.VALID);
+						copyArrayElement(aValidData,oDependencyResult["validData"]);						
+					}					
+				}else{
+					oDocTreeDep[sCurDoc] = {
+						status: OPERATECONS.VALIDATESTATUS.VALID, 
+						aDependency: []						
+					};
+					aValidData.push(oRow);
+				}
+			}
+			
+		}
+	}
+
+	oResultData["validData"] = aValidData;
+	oResultData["rejectData"] = aRejectData;
+
+	return oResultData;
 	//loop at aTableBatchData, try to find parent folder, 
 		//if parent folder exist
 			//if parent folder is valid
@@ -679,7 +779,7 @@ function filterFileServiceEntries(sTableName, sFilePathColumn, aTableData){
 				for(let iVariableIndex=0; iVariableIndex<iVariableCount; iVariableIndex++){
 					oVariable = aVariables[iVariableIndex];
 					sVariableValue = RegExp["$" + (iIndex + 1)];
-					let oTableForeignKey = getForeignKeyWithType(oVariable[operateCons.OBJID]);
+					let oTableForeignKey = getForeignKeyWithType(oVariable[OPERATECONS.OBJID]);
 					aTableForeignKeys.push(oTableForeignKey);					
 				}
 
