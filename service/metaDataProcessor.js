@@ -609,6 +609,109 @@ function filterSpecialTableEntries(sTableName, aTableData){
 
 }
 
+
+
+function flterPersistenceResourceHierarchy(sTableName, aTableBatchData){
+	oDocTreeDep = getHierarchyDependency(sTableName);
+	const sColName = "RESOURCE_ID";
+	const sParentColName = "PARENT_RES_ID";
+	const sColNameCreateTime = "CREATE_TIME";
+	let iRowCount = aTableBatchData.length;
+	let oResult = {};
+	let aValidData = [];
+	let aRejectData = [];
+	let oDependencyResult = null;
+
+	//first sort the table entries, this is only used to enhance performance
+	aTableBatchData.sort(function(oRowA, oRowB){		
+		if (oRowA[sColNameCreateTime] < oRowB[sColNameCreateTime] ) {
+		    return -1;
+		}
+		if (oRowA[sColNameCreateTime] > oRowB[sColNameCreateTime] ) {
+		    return 1;
+		}		
+		return 0;		
+	});
+	
+	//oDocTreeDep={"docName:{status:1, aDependency["docName1", "docName2"]}"}
+	for(let iRowIndex=0; iRowIndex<iRowCount; iRowIndex++){
+		let oRow = aTableBatchData[iRowIndex];
+		let sCurDoc = oRow[sColName]
+		let sParentDoc = oRow[sParentColName];
+		let bHasParent = sParentDoc ? true : false;
+		if(bHasParent && oDocTreeDep.hasOwnProperty(sParentDoc)){
+			let sParentStatus = oDocTreeDep[sParentDoc].status;
+			if(oDocTreeDep.hasOwnProperty(sCurDoc)){
+				oDocTreeDep[sCurDoc].status = sParentStatus;
+				if(sParentStatus === OPERATECONS.VALIDATESTATUS.UNKNOWN){
+					holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
+				}else{
+					if(oDocTreeDep[sCurDoc].aDependency.length > 0){
+						oDependencyResult = validateDocTreeDependency(oDocTreeDep, oDocTreeDep[sCurDoc].aDependency, sParentStatus);
+						copyArrayElement(aValidData,oDependencyResult["validData"]);
+						copyArrayElement(aRejectData, oDependencyResult["rejectData"]);
+					}
+				}					
+			}else{
+				oDocTreeDep[sCurDoc] = {
+					status: sParentStatus, 
+					aDependency: []						
+				};
+				switch(sParentStatus){
+					case OPERATECONS.VALIDATESTATUS.VALID:
+						aValidData.push(oRow);
+						break;
+					case OPERATECONS.VALIDATESTATUS.UNKNOWN:
+						holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
+						break;
+					case OPERATECONS.VALIDATESTATUS.INVALID:
+						aRejectData.push(oRow);
+						break;
+				}
+			}
+		}else{			
+			
+			if(bHasParent){
+				oDocTreeDep[sParentDoc] = {
+					status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
+					aDependency: [sCurDoc]						
+				};
+
+				if(oDocTreeDep.hasOwnProperty(sCurDoc)){
+					//nothing change
+				}else{
+					oDocTreeDep[sCurDoc] = {
+						status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
+						aDependency: []						
+					};
+				}
+				holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
+			}else{
+				if(oDocTreeDep.hasOwnProperty(sCurDoc)){
+					oDocTreeDep[sCurDoc].status = OPERATECONS.VALIDATESTATUS.VALID;
+					aValidData.push(oRow);
+					if(oDocTreeDep[sCurDoc].aDependency.length > 0){
+						oDependencyResult = validateDocTreeDependency(oDocTreeDep, oDocTreeDep[sCurDoc].aDependency, OPERATECONS.VALIDATESTATUS.VALID);
+						copyArrayElement(aValidData,oDependencyResult["validData"]);						
+					}					
+				}else{
+					oDocTreeDep[sCurDoc] = {
+						status: OPERATECONS.VALIDATESTATUS.VALID, 
+						aDependency: []						
+					};
+					aValidData.push(oRow);
+				}
+			}
+			
+		}
+	}
+
+	oResultData["validData"] = aValidData;
+	oResultData["rejectData"] = aRejectData;
+
+	return oResultData;
+}
+
 function filterFileServiceDocEntries(sTableName, aTableData){
 	return filterFileServiceEntries(sTableName, "DOC", aTableData);
 }
@@ -625,12 +728,37 @@ function filterFileServiceDocTreeEntries(sTableName, aTableData){
 }
 
 function holdFileServiceDocTreeRow(oDocTreeDep, sDocName, oRow){
+	var aRows = getHeldTableBatchRows(sDocName);
+	aRows.push(oRow);
+	if(aRows.length > OPERATECONS.SPLITROWCOUNT){
+		//sync write aRows into file
+		var sHeldTableBatchFileName = getHeldTableBatchFileName(sDocName);
+		//TBD
+	}
+}
 
+function validateDocTreeDependency(oDocTreeDep, aDependency, sStatus){
+	if(sStatus === OPERATECONS.VALIDATESTATUS.UNKNOWN){
+		return {};
+	}
+
+	while(aDependency.length > 0){
+		var sDependencyName = aDependency.shift();
+		if(oDocTreeDep.hasOwnProperty(sDependencyName)){
+			var oDependency = oDocTreeDep[sDependencyName];
+			oDependency.status = sStatus;
+			if(oDependency.aDependency.length > 0){
+				for(let iDependIndex=0, let iDepCount = oDependency.aDependency.length; iDependIndex<iDepCount; iDependIndex++){
+					aDependency.push(oDependency.aDependency.shift());					
+				}
+			}
+		}
+	}
 }
 
 function flterFileServiceHierarchy(sTableName, aTableBatchData){
 	
-	oDocTreeDep = getDocTreeDependency();
+	oDocTreeDep = getHierarchyDependency(sTableName);
 	const sColName = "DOCNAME";
 	const sParentColName = "PARENTDOC";
 	let iRowCount = aTableBatchData.length;
