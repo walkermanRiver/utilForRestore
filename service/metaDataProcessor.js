@@ -609,18 +609,282 @@ function filterSpecialTableEntries(sTableName, aTableData){
 
 }
 
+// function validateHierarchyNodeDependency(oDocTreeDep, aDependency, sStatus){
+function validateHierarchyNodeDependency(oHierarchyDep, sCurNodeName, sCurHierarchyName, sCurNodeStatus, aHierarchyName){
+
+	//first make sure the currenct node exist in the check tree
+	if(oHierarchyDep.hasOwnProperty(sCurNodeName) === false){
+		oHierarchyDep[sCurNodeName] = {
+			status: sCurNodeStatus, 
+			pendingChildren: {			
+			}			
+		};
+	}
+
+	if(oHierarchyDep[sCurNodeName].pendingChildren.hasOwnProperty(sCurHierarchyName) === false){
+		oHierarchyDep[sCurNodeName].pendingChildren[sCurHierarchyName] = {
+			status : sCurNodeStatus,
+			childNodes: []
+		}
+	}
+
+	//if the status is unknow, it can not continue to check
+	// if(sCurNodeStatus === OPERATECONS.VALIDATESTATUS.UNKNOWN){
+	// 	return;
+	// }
+
+	let oHierarchyDepNode = oHierarchyDep[sCurNodeName];
+	let aHierarchyDepNodes = [oHierarchyDepNode];	
+	let iHierarchyCount = aHierarchyName.length;	
+
+	while(aHierarchyDepNodes.length > 0){
+		let oHierarchyDepNode = aHierarchyDepNodes.shift();
+		let oPendingChildren = oHierarchyDepNode.pendingChildren;
+		// if(oPendingChildren.)
+
+		let bInvalid = false;
+		let bAllValid = true;
+		let oNextDepNodes = {}; 
+		if(sCurNodeStatus < oHierarchyDepNode.status){
+			oHierarchyDepNode.status = sCurNodeStatus;
+		}
+		
+		for(let iHierIndex=0; iHierIndex<iHierarchyCount; iHierIndex++){
+			let sHierarchyName = aHierarchyName[iHierIndex];		
+
+			if(oPendingChildren.hasOwnProperty(sHierarchyName)){
+				let oPendingChildrenDepNode = oPendingChildren[sHierarchyName];
+				if(sHierarchyName === sCurHierarchyName){					
+					if(oPendingChildrenDepNode.status != OPERATECONS.VALIDATESTATUS.INVALID && sCurNodeStatus != oPendingChildrenDepNode.status){					
+						oPendingChildrenDepNode.status = sCurNodeStatus;
+						let iPendingChildrenNodeCount = childNodes.length;
+						//here we must not remove the children, otherwise when new hierarchy is involved, we lose the children infomation to update them
+						for(let iPendingChildRenNodeIndex=0; iPendingChildRenNodeIndex<iPendingChildrenNodeCount; iPendingChildRenNodeIndex++){
+							oNextDepNodes[oPendingChildrenDepNode.childNodes[iPendingChildRenNodeIndex]] = true;
+						}						
+					}
+					if(oPendingChildrenDepNode.status != OPERATECONS.VALIDATESTATUS.VALID){
+						bAllValid = false;
+					}
+				}else{
+					//if one node is explicitly invalid, then it can apply to its all children in all hierarchy
+					if(sCurNodeStatus === OPERATECONS.VALIDATESTATUS.INVALID){
+						bInvalid = true;
+						oPendingChildrenDepNode.status = sCurNodeStatus;
+						let iPendingChildrenNodeCount = childNodes.length;
+						//here we must not remove the children, otherwise when new hierarchy is involved, we lose the children infomation to update them
+						for(let iPendingChildRenNodeIndex=0; iPendingChildRenNodeIndex<iPendingChildrenNodeCount; iPendingChildRenNodeIndex++){
+							oNextDepNodes[oPendingChildrenDepNode.childNodes[iPendingChildRenNodeIndex]] = true;
+						}						
+					}
+
+					if(oPendingChildrenDepNode.status != OPERATECONS.VALIDATESTATUS.VALID){
+						bAllValid = false;
+					}
+				}
+			}else{
+				//we do not know this hierarchy status, so the overall status should not be valid
+				bAllValid = false;
+				oPendingChildren[sHierarchyName] = {
+					status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
+					childNodes: []
+				};
+			}
+		}
+
+		if(bInvalid === true || bAllValid === true){
+			for(let iHierIndex=0; iHierIndex<iHierarchyCount; iHierIndex++){
+				let sHierarchyName = aHierarchyName[iHierIndex];
+				let oPendingChildrenDepNode = oPendingChildren[sHierarchyName];
+				//here we can remove the children infomation since we have got the node status
+				while(oPendingChildrenDepNode.childNodes.length > 0){
+					oNextDepNodes[oPendingChildrenDepNode.childNodes.shift()] = true;
+				}					
+			}			
+		}
+
+		for(sNextNode in oNextDepNodes){
+			aHierarchyDepNodes.push(oHierarchyDep[sNextNode]);
+		}
+
+		if(bAllValid === true){
+			oHierarchyDepNode.status = OPERATECONS.VALIDATESTATUS.VALID;
+		}
+		
+	}
+
+	return;
+}
+
+function setAndValidateHierarchyNodeDependency(oHierarchyDep, sParentNodeName, sCurNodeName, sCurHierarchyName, aHierarchyName){
+			
+	let bHasParent = !!sParentNodeName;
+	if(bHasParent === false){
+		validateHierarchyNodeDependency(oHierarchyDep, sCurNodeName, sCurHierarchyName, OPERATECONS.VALIDATESTATUS.VALID, aHierarchyName );
+		return;
+	}
+
+	if(oHierarchyDep.hasOwnProperty(sParentNodeName) === false){
+		oHierarchyDep[sParentNodeName] = {
+			status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
+			pendingChildren: {			
+			}			
+		};
+	}
+
+	if(oHierarchyDep[sParentNodeName].pendingChildren.hasOwnProperty(sCurHierarchyName) === false){
+		oHierarchyDep[sParentNodeName].pendingChildren[sCurHierarchyName] = {
+			status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
+			childNodes: []
+		}
+	}
+
+	oHierarchyDep[sParentNodeName].pendingChildren[sCurHierarchyName].childNodes.push(sCurNodeName);
+	let sParentStatus = oHierarchyDep[sParentNodeName].pendingChildren[sCurHierarchyName].status;
+	validateHierarchyNodeDependency(oHierarchyDep, sCurNodeName, sCurHierarchyName, sParentStatus, aHierarchyName );
+
+	return;
+}
+
+//oDocTreeDep is following format
+// {
+//   "docName": {
+//     "status": 1,
+//     "pendingChildren": {
+//       "hir1": {
+//         "status": 1,
+//         "childNodes": [
+//           "docName1",
+//           "docName2"
+//         ]
+//       },
+//       "hir2": {
+//         "status": 1,
+//         "childNodes": [
+//           "docName3",
+//           "docName4"
+//         ]
+//       }
+//     }
+//   }
+// }
+function validateTableRowsHierarchy(aTableBatchData, oHierarchyDep, sColNameCurrent, aColNameParents){
+	let iRowCount = aTableBatchData.length;	
+	let iParentCount = aColNameParents.length;
+	let iParentColumnCount = aColNameParents.length;
+
+	for(let iRowIndex=0; iRowIndex<iRowCount; iRowIndex++){
+		let oRow = aTableBatchData[iRowIndex];
+		//TBD we can hash the node key value later to reduce the memory cost
+		let sCurRowNode = oRow[sColNameCurrent];
+		for(let iParentColumnIndex=0; iParentColumnIndex<iParentColumnCount; iParentColumnIndex++){
+			let sColNameParent = aColNameParents[iParentColumnIndex];
+			let sParentRowNode = oRow[sColNameParent];
+			setAndValidateHierarchyNodeDependency(oHierarchyDep, sParentRowNode, sCurRowNode, sColNameParent, aColNameParents);
+		}
+
+		
+		// for(let iParentIndex=0; iParentIndex<iParentCount; iParentIndex++){
+		// 	let sColNameParent = aColNameParents[iParentIndex];
+
+		// 	setAndValidateHierarchyNodeDependency(oHierarchyDep, sParentNodeName, sCurNodeName, sCurHierarchyName, aHierarchyName){
 
 
-function flterPersistenceResourceHierarchy(sTableName, aTableBatchData){
+
+
+
+
+
+
+		// 	let bHasParent = sParentRowNode ? true : false;
+		// 	if(bHasParent && oHierarchyDep.hasOwnProperty(sParentRowNode)){
+		// 		if(oHierarchyDep[sParentRowNode].pendingChildren.hasOwnProperty(sColNameParent) === false){
+		// 			oHierarchyDep[sParentRowNode].pendingChildren[sColNameParent] = {
+		// 				status: OPERATECONS.VALIDATESTATUS.UNKNOWN,
+		// 				childNodes: [sCurRowNode]
+		// 			};
+		// 		}
+
+		// 		let sParentStatus = oHierarchyDep[sParentRowNode].pendingChildren[sColNameParent].status;
+		// 		if(oHierarchyDep.hasOwnProperty(sCurRowNode)){
+		// 			oHierarchyDep[sCurRowNode].pendingChildren[sColNameParent].status = sParentStatus;
+					
+		// 			// if(oHierarchyDep[sCurRowNode].dependency[sColNameParent].length > 0){
+		// 			validateHierarchyNodeDependency(oHierarchyDep, sCurRowNode, sColNameParent, sParentStatus, aColNameParents );
+		// 			// }
+								
+		// 		}else{
+		// 			oHierarchyDep[sCurRowNode] = {
+		// 				status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
+		// 				pendingChildren: {
+		// 					sColNameParent: {
+		// 						status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
+		// 						childNodes: []
+		// 					}
+		// 				}
+						
+		// 			};					
+		// 		}
+		// 	}else{			
+				
+		// 		if(bHasParent){
+		// 			oHierarchyDep[sParentDoc] = {
+		// 				status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
+		// 				pendingChildren: {
+		// 					sColNameParent: {
+		// 						status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
+		// 						childNodes: [sCurRowNode]
+		// 					}
+		// 				}
+						
+		// 			};
+					
+
+		// 			if(oHierarchyDep.hasOwnProperty(sCurRowNode)){
+		// 				//nothing change
+		// 				validateHierarchyNodeDependency(oHierarchyDep, sCurRowNode, sColNameParent, OPERATECONS.VALIDATESTATUS.UNKNOWN, aColNameParents );
+		// 			}else{
+		// 				oHierarchyDep[sCurRowNode] = {
+		// 					status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
+		// 					pendingChildren: {
+		// 						sColNameParent: {
+		// 							status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
+		// 							childNodes: []
+		// 						}
+		// 					}
+		// 				};
+		// 			}				
+		// 		}else{
+		// 			if(oHierarchyDep.hasOwnProperty(sCurRowNode)){
+		// 				validateHierarchyNodeDependency(oHierarchyDep, sCurRowNode, sColNameParent, OPERATECONS.VALIDATESTATUS.VALID, aColNameParents );
+		// 				// oHierarchyDep[sCurRowNode].status = OPERATECONS.VALIDATESTATUS.VALID;					
+		// 				// if(oHierarchyDep[sCurRowNode].dependency[sColNameParent].length > 0){
+		// 				// 	validateHierarchyNodeDependency(oHierarchyDep, oHierarchyDep[sCurRowNode].dependency[sColNameParent], aColNameParents, sColNameParent, OPERATECONS.VALIDATESTATUS.VALID);										
+		// 				// }					
+		// 			}else{
+		// 				oHierarchyDep[sCurRowNode] = {
+		// 					status: OPERATECONS.VALIDATESTATUS.VALID, 
+		// 					pendingChildren: {
+		// 						sColNameParent: {
+		// 							status : OPERATECONS.VALIDATESTATUS.VALID,
+		// 							childNodes: []
+		// 						}
+		// 					}
+		// 				};					
+		// 			}
+		// 		}				
+		// 	}			
+		// }
+	}
+
+	return;
+}
+
+function validatePersistenceResourceHierarchy(sTableName, aTableBatchData){
 	oDocTreeDep = getHierarchyDependency(sTableName);
-	const sColName = "RESOURCE_ID";
-	const sParentColName = "PARENT_RES_ID";
-	const sColNameCreateTime = "CREATE_TIME";
-	let iRowCount = aTableBatchData.length;
-	let oResult = {};
-	let aValidData = [];
-	let aRejectData = [];
-	let oDependencyResult = null;
+	const sColNameCurrent = "RESOURCE_ID";
+	const sColNameParent = "PARENT_RES_ID";
+	const sColNameCreateTime = "CREATE_TIME";	
 
 	//first sort the table entries, this is only used to enhance performance
 	aTableBatchData.sort(function(oRowA, oRowB){		
@@ -632,77 +896,54 @@ function flterPersistenceResourceHierarchy(sTableName, aTableBatchData){
 		}		
 		return 0;		
 	});
-	
-	//oDocTreeDep={"docName:{status:1, aDependency["docName1", "docName2"]}"}
-	for(let iRowIndex=0; iRowIndex<iRowCount; iRowIndex++){
-		let oRow = aTableBatchData[iRowIndex];
-		let sCurDoc = oRow[sColName]
-		let sParentDoc = oRow[sParentColName];
-		let bHasParent = sParentDoc ? true : false;
-		if(bHasParent && oDocTreeDep.hasOwnProperty(sParentDoc)){
-			let sParentStatus = oDocTreeDep[sParentDoc].status;
-			if(oDocTreeDep.hasOwnProperty(sCurDoc)){
-				oDocTreeDep[sCurDoc].status = sParentStatus;
-				if(sParentStatus === OPERATECONS.VALIDATESTATUS.UNKNOWN){
-					holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
-				}else{
-					if(oDocTreeDep[sCurDoc].aDependency.length > 0){
-						oDependencyResult = validateDocTreeDependency(oDocTreeDep, oDocTreeDep[sCurDoc].aDependency, sParentStatus);
-						copyArrayElement(aValidData,oDependencyResult["validData"]);
-						copyArrayElement(aRejectData, oDependencyResult["rejectData"]);
-					}
-				}					
-			}else{
-				oDocTreeDep[sCurDoc] = {
-					status: sParentStatus, 
-					aDependency: []						
-				};
-				switch(sParentStatus){
-					case OPERATECONS.VALIDATESTATUS.VALID:
-						aValidData.push(oRow);
-						break;
-					case OPERATECONS.VALIDATESTATUS.UNKNOWN:
-						holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
-						break;
-					case OPERATECONS.VALIDATESTATUS.INVALID:
-						aRejectData.push(oRow);
-						break;
-				}
-			}
-		}else{			
-			
-			if(bHasParent){
-				oDocTreeDep[sParentDoc] = {
-					status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
-					aDependency: [sCurDoc]						
-				};
 
-				if(oDocTreeDep.hasOwnProperty(sCurDoc)){
-					//nothing change
-				}else{
-					oDocTreeDep[sCurDoc] = {
-						status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
-						aDependency: []						
-					};
+	validateTableRowsHierarchy(aTableBatchData, oDocTreeDep, sColNameCurrent, sColNameParent);
+}
+
+function filterPersistenceResourceRows(sTableName, aTableBatchData){	
+	const sColNameOwnType = "OWNER_TYPE";
+	const sColNameOwnerId = "OWNER_ID";
+	
+	let oRow = null;
+	let aTableForeignKeys = [];
+	let bRowValid = false;
+
+	let oResultData = {};
+	let aValidData = [];
+	let aRejectData = [];
+
+	for(let iRowIndex=0, iRowCount=aTableData.length; iRowIndex<iRowCount; iRowIndex++){
+		oRow = aTableData[iRowIndex];
+		
+		bRowValid = false;
+		sDocName = oRow[sFilePathColumn];
+		aTableForeignKeys = [];
+
+		for(let iPatternIndex=0; iPatternIndex<iPatternCount; iPatternIndex++){
+			oPattern = aValidFileRegExps[iPatternIndex]["oPattern"];
+			if(oPattern.test(sDocName) === true){				
+				aVariables = aValidFileRegExps[iPatternIndex]["aVariables"];
+				iVariableCount = aVariables.length;
+				for(let iVariableIndex=0; iVariableIndex<iVariableCount; iVariableIndex++){
+					oVariable = aVariables[iVariableIndex];
+					sVariableValue = RegExp["$" + (iIndex + 1)];
+					let oTableForeignKey = getForeignKeyWithType(oVariable[OPERATECONS.OBJID]);
+					aTableForeignKeys.push(oTableForeignKey);					
 				}
-				holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
-			}else{
-				if(oDocTreeDep.hasOwnProperty(sCurDoc)){
-					oDocTreeDep[sCurDoc].status = OPERATECONS.VALIDATESTATUS.VALID;
-					aValidData.push(oRow);
-					if(oDocTreeDep[sCurDoc].aDependency.length > 0){
-						oDependencyResult = validateDocTreeDependency(oDocTreeDep, oDocTreeDep[sCurDoc].aDependency, OPERATECONS.VALIDATESTATUS.VALID);
-						copyArrayElement(aValidData,oDependencyResult["validData"]);						
-					}					
-				}else{
-					oDocTreeDep[sCurDoc] = {
-						status: OPERATECONS.VALIDATESTATUS.VALID, 
-						aDependency: []						
-					};
-					aValidData.push(oRow);
-				}
+
+				break;				
 			}
-			
+		}
+
+		if(aTableForeignKeys.length > 0){
+			bRowValid = validateTableRow(oRow,aTableForeignKeys,oReferenceTableColumn);
+			if(bRowValid){
+				aValidData.push(oRow);
+			}else{
+				aRejectData.push(oRow);
+			}
+		}else{
+			aValidData.push(oRow);
 		}
 	}
 
@@ -737,35 +978,30 @@ function holdFileServiceDocTreeRow(oDocTreeDep, sDocName, oRow){
 	}
 }
 
-function validateDocTreeDependency(oDocTreeDep, aDependency, sStatus){
-	if(sStatus === OPERATECONS.VALIDATESTATUS.UNKNOWN){
-		return {};
-	}
+// function validateDocTreeDependency(oDocTreeDep, aDependency, sStatus){
+// 	if(sStatus === OPERATECONS.VALIDATESTATUS.UNKNOWN){
+// 		return {};
+// 	}
 
-	while(aDependency.length > 0){
-		var sDependencyName = aDependency.shift();
-		if(oDocTreeDep.hasOwnProperty(sDependencyName)){
-			var oDependency = oDocTreeDep[sDependencyName];
-			oDependency.status = sStatus;
-			if(oDependency.aDependency.length > 0){
-				for(let iDependIndex=0, let iDepCount = oDependency.aDependency.length; iDependIndex<iDepCount; iDependIndex++){
-					aDependency.push(oDependency.aDependency.shift());					
-				}
-			}
-		}
-	}
-}
+// 	while(aDependency.length > 0){
+// 		var sDependencyName = aDependency.shift();
+// 		if(oDocTreeDep.hasOwnProperty(sDependencyName)){
+// 			var oDependency = oDocTreeDep[sDependencyName];
+// 			oDependency.status = sStatus;
+// 			if(oDependency.aDependency.length > 0){
+// 				for(let iDependIndex=0, let iDepCount = oDependency.aDependency.length; iDependIndex<iDepCount; iDependIndex++){
+// 					aDependency.push(oDependency.aDependency.shift());					
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 
-function flterFileServiceHierarchy(sTableName, aTableBatchData){
-	
+function validateFileServiceHierarchy(sTableName, aTableBatchData){
+	//oDocTreeDep={"docName:{status:1, aDependency["docName1", "docName2"]}"}
 	oDocTreeDep = getHierarchyDependency(sTableName);
-	const sColName = "DOCNAME";
-	const sParentColName = "PARENTDOC";
-	let iRowCount = aTableBatchData.length;
-	let oResult = {};
-	let aValidData = [];
-	let aRejectData = [];
-	let oDependencyResult = null;
+	const sColNameCurrent = "DOCNAME";
+	const sColNameParent = "PARENTDOC";	
 
 	//first sort the table entries based on docname. this is special to file service, but can not be used to persistence	
 	aTableBatchData.sort(function(oRowA, oRowB){
@@ -777,101 +1013,8 @@ function flterFileServiceHierarchy(sTableName, aTableBatchData){
 		}		
 		return 0;		
 	});
-	
-	//oDocTreeDep={"docName:{status:1, aDependency["docName1", "docName2"]}"}
-	for(let iRowIndex=0; iRowIndex<iRowCount; iRowIndex++){
-		let oRow = aTableBatchData[iRowIndex];
-		let sCurDoc = oRow[sColName]
-		let sParentDoc = oRow[sParentColName];
-		let bHasParent = sParentDoc ? true : false;
-		if(bHasParent && oDocTreeDep.hasOwnProperty(sParentDoc)){
-			let sParentStatus = oDocTreeDep[sParentDoc].status;
-			if(oDocTreeDep.hasOwnProperty(sCurDoc)){
-				oDocTreeDep[sCurDoc].status = sParentStatus;
-				if(sParentStatus === OPERATECONS.VALIDATESTATUS.UNKNOWN){
-					holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
-				}else{
-					if(oDocTreeDep[sCurDoc].aDependency.length > 0){
-						oDependencyResult = validateDocTreeDependency(oDocTreeDep, oDocTreeDep[sCurDoc].aDependency, sParentStatus);
-						copyArrayElement(aValidData,oDependencyResult["validData"]);
-						copyArrayElement(aRejectData, oDependencyResult["rejectData"]);
-					}
-				}					
-			}else{
-				oDocTreeDep[sCurDoc] = {
-					status: sParentStatus, 
-					aDependency: []						
-				};
-				switch(sParentStatus){
-					case OPERATECONS.VALIDATESTATUS.VALID:
-						aValidData.push(oRow);
-						break;
-					case OPERATECONS.VALIDATESTATUS.UNKNOWN:
-						holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
-						break;
-					case OPERATECONS.VALIDATESTATUS.INVALID:
-						aRejectData.push(oRow);
-						break;
-				}
-			}
-		}else{			
-			
-			if(bHasParent){
-				oDocTreeDep[sParentDoc] = {
-					status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
-					aDependency: [sCurDoc]						
-				};
 
-				if(oDocTreeDep.hasOwnProperty(sCurDoc)){
-					//nothing change
-				}else{
-					oDocTreeDep[sCurDoc] = {
-						status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
-						aDependency: []						
-					};
-				}
-				holdFileServiceDocTreeRow(oDocTreeDep,sCurDoc, oRow);
-			}else{
-				if(oDocTreeDep.hasOwnProperty(sCurDoc)){
-					oDocTreeDep[sCurDoc].status = OPERATECONS.VALIDATESTATUS.VALID;
-					aValidData.push(oRow);
-					if(oDocTreeDep[sCurDoc].aDependency.length > 0){
-						oDependencyResult = validateDocTreeDependency(oDocTreeDep, oDocTreeDep[sCurDoc].aDependency, OPERATECONS.VALIDATESTATUS.VALID);
-						copyArrayElement(aValidData,oDependencyResult["validData"]);						
-					}					
-				}else{
-					oDocTreeDep[sCurDoc] = {
-						status: OPERATECONS.VALIDATESTATUS.VALID, 
-						aDependency: []						
-					};
-					aValidData.push(oRow);
-				}
-			}
-			
-		}
-	}
-
-	oResultData["validData"] = aValidData;
-	oResultData["rejectData"] = aRejectData;
-
-	return oResultData;
-	//loop at aTableBatchData, try to find parent folder, 
-		//if parent folder exist
-			//if parent folder is valid
-				//this row is valid
-				//check if there are pending rows depends on current row
-			//else
-				//this row is invalid
-				//check if there are pending rows depends on current row
-			//endif
-		//else
-			//pending current row, the pending row and pending infomation should be cached cross batch, 
-			//if there are too much memory cost, the pending row can be pushed to some temp files and update the corresponding pending infomation
-			//but we should make sure we can get back the rows with pending infomation
-		//endif	
-	//end loop
-
-	//later, in the post process of the table, we should clean the pending infomation , pending rows and pending files
+	validateTableRowsHierarchy(aTableBatchData, oDocTreeDep, sColNameCurrent, sColNameParent);	
 }
 
 function filterFileServiceEntries(sTableName, sFilePathColumn, aTableData){

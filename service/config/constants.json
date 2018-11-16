@@ -22,8 +22,8 @@
 		"USERID": "([^\\s]+)"
 	},
 	"VALIDATESTATUS":{
-		"VALID": 1,
+		"INVALID": -1,
 		"UNKNOWN": 0,
-		"INVALID": -1
+		"VALID": 1		
 	}
 }
