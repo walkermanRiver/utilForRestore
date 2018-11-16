@@ -609,7 +609,28 @@ function filterSpecialTableEntries(sTableName, aTableData){
 
 }
 
-// function validateHierarchyNodeDependency(oDocTreeDep, aDependency, sStatus){
+//oHierarchyDep is following format
+// {
+//   "docName": {
+//     "status": 1,
+//     "pendingChildren": {
+//       "hir1": {
+//         "status": 1,
+//         "childNodes": [
+//           "docName1",
+//           "docName2"
+//         ]
+//       },
+//       "hir2": {
+//         "status": 1,
+//         "childNodes": [
+//           "docName3",
+//           "docName4"
+//         ]
+//       }
+//     }
+//   }
+// }
 function validateHierarchyNodeDependency(oHierarchyDep, sCurNodeName, sCurHierarchyName, sCurNodeStatus, aHierarchyName){
 
 	//first make sure the currenct node exist in the check tree
@@ -627,11 +648,6 @@ function validateHierarchyNodeDependency(oHierarchyDep, sCurNodeName, sCurHierar
 			childNodes: []
 		}
 	}
-
-	//if the status is unknow, it can not continue to check
-	// if(sCurNodeStatus === OPERATECONS.VALIDATESTATUS.UNKNOWN){
-	// 	return;
-	// }
 
 	let oHierarchyDepNode = oHierarchyDep[sCurNodeName];
 	let aHierarchyDepNodes = [oHierarchyDepNode];	
@@ -685,10 +701,11 @@ function validateHierarchyNodeDependency(oHierarchyDep, sCurNodeName, sCurHierar
 			}else{
 				//we do not know this hierarchy status, so the overall status should not be valid
 				bAllValid = false;
-				oPendingChildren[sHierarchyName] = {
-					status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
-					childNodes: []
-				};
+				//we have make sure that when one node is checked, the parent node must be added, so this should not happen in this case
+				// oPendingChildren[sHierarchyName] = {
+				// 	status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
+				// 	childNodes: []
+				// };
 			}
 		}
 
@@ -746,31 +763,9 @@ function setAndValidateHierarchyNodeDependency(oHierarchyDep, sParentNodeName, s
 	return;
 }
 
-//oDocTreeDep is following format
-// {
-//   "docName": {
-//     "status": 1,
-//     "pendingChildren": {
-//       "hir1": {
-//         "status": 1,
-//         "childNodes": [
-//           "docName1",
-//           "docName2"
-//         ]
-//       },
-//       "hir2": {
-//         "status": 1,
-//         "childNodes": [
-//           "docName3",
-//           "docName4"
-//         ]
-//       }
-//     }
-//   }
-// }
+
 function validateTableRowsHierarchy(aTableBatchData, oHierarchyDep, sColNameCurrent, aColNameParents){
-	let iRowCount = aTableBatchData.length;	
-	let iParentCount = aColNameParents.length;
+	let iRowCount = aTableBatchData.length;
 	let iParentColumnCount = aColNameParents.length;
 
 	for(let iRowIndex=0; iRowIndex<iRowCount; iRowIndex++){
@@ -781,100 +776,7 @@ function validateTableRowsHierarchy(aTableBatchData, oHierarchyDep, sColNameCurr
 			let sColNameParent = aColNameParents[iParentColumnIndex];
 			let sParentRowNode = oRow[sColNameParent];
 			setAndValidateHierarchyNodeDependency(oHierarchyDep, sParentRowNode, sCurRowNode, sColNameParent, aColNameParents);
-		}
-
-		
-		// for(let iParentIndex=0; iParentIndex<iParentCount; iParentIndex++){
-		// 	let sColNameParent = aColNameParents[iParentIndex];
-
-		// 	setAndValidateHierarchyNodeDependency(oHierarchyDep, sParentNodeName, sCurNodeName, sCurHierarchyName, aHierarchyName){
-
-
-
-
-
-
-
-
-		// 	let bHasParent = sParentRowNode ? true : false;
-		// 	if(bHasParent && oHierarchyDep.hasOwnProperty(sParentRowNode)){
-		// 		if(oHierarchyDep[sParentRowNode].pendingChildren.hasOwnProperty(sColNameParent) === false){
-		// 			oHierarchyDep[sParentRowNode].pendingChildren[sColNameParent] = {
-		// 				status: OPERATECONS.VALIDATESTATUS.UNKNOWN,
-		// 				childNodes: [sCurRowNode]
-		// 			};
-		// 		}
-
-		// 		let sParentStatus = oHierarchyDep[sParentRowNode].pendingChildren[sColNameParent].status;
-		// 		if(oHierarchyDep.hasOwnProperty(sCurRowNode)){
-		// 			oHierarchyDep[sCurRowNode].pendingChildren[sColNameParent].status = sParentStatus;
-					
-		// 			// if(oHierarchyDep[sCurRowNode].dependency[sColNameParent].length > 0){
-		// 			validateHierarchyNodeDependency(oHierarchyDep, sCurRowNode, sColNameParent, sParentStatus, aColNameParents );
-		// 			// }
-								
-		// 		}else{
-		// 			oHierarchyDep[sCurRowNode] = {
-		// 				status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
-		// 				pendingChildren: {
-		// 					sColNameParent: {
-		// 						status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
-		// 						childNodes: []
-		// 					}
-		// 				}
-						
-		// 			};					
-		// 		}
-		// 	}else{			
-				
-		// 		if(bHasParent){
-		// 			oHierarchyDep[sParentDoc] = {
-		// 				status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
-		// 				pendingChildren: {
-		// 					sColNameParent: {
-		// 						status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
-		// 						childNodes: [sCurRowNode]
-		// 					}
-		// 				}
-						
-		// 			};
-					
-
-		// 			if(oHierarchyDep.hasOwnProperty(sCurRowNode)){
-		// 				//nothing change
-		// 				validateHierarchyNodeDependency(oHierarchyDep, sCurRowNode, sColNameParent, OPERATECONS.VALIDATESTATUS.UNKNOWN, aColNameParents );
-		// 			}else{
-		// 				oHierarchyDep[sCurRowNode] = {
-		// 					status: OPERATECONS.VALIDATESTATUS.UNKNOWN, 
-		// 					pendingChildren: {
-		// 						sColNameParent: {
-		// 							status : OPERATECONS.VALIDATESTATUS.UNKNOWN,
-		// 							childNodes: []
-		// 						}
-		// 					}
-		// 				};
-		// 			}				
-		// 		}else{
-		// 			if(oHierarchyDep.hasOwnProperty(sCurRowNode)){
-		// 				validateHierarchyNodeDependency(oHierarchyDep, sCurRowNode, sColNameParent, OPERATECONS.VALIDATESTATUS.VALID, aColNameParents );
-		// 				// oHierarchyDep[sCurRowNode].status = OPERATECONS.VALIDATESTATUS.VALID;					
-		// 				// if(oHierarchyDep[sCurRowNode].dependency[sColNameParent].length > 0){
-		// 				// 	validateHierarchyNodeDependency(oHierarchyDep, oHierarchyDep[sCurRowNode].dependency[sColNameParent], aColNameParents, sColNameParent, OPERATECONS.VALIDATESTATUS.VALID);										
-		// 				// }					
-		// 			}else{
-		// 				oHierarchyDep[sCurRowNode] = {
-		// 					status: OPERATECONS.VALIDATESTATUS.VALID, 
-		// 					pendingChildren: {
-		// 						sColNameParent: {
-		// 							status : OPERATECONS.VALIDATESTATUS.VALID,
-		// 							childNodes: []
-		// 						}
-		// 					}
-		// 				};					
-		// 			}
-		// 		}				
-		// 	}			
-		// }
+		}		
 	}
 
 	return;
