@@ -12,7 +12,15 @@ const OPERATECONS = require("./config/constants.json");
 // 	this.sOutPutFolder = sOutPutFolder;
 // }
 
-function preProcessSoureFilePromise(sSourceFileName, sOutPutFolder){
+function metaDataProcess(){
+
+}
+
+metaDataProcess.prototype.getForeignKeyWithType = function(sTypeId){
+
+};
+
+metaDataProcess.prototype.preProcessSoureFilePromise = function(sSourceFileName, sOutPutFolder){
 	return new Promise((resolve, reject) => {
 		context.oAppset.sSourceFileName = sSourceFileName;
 		context.oAppset.sOutPutFolder = sOutPutFolder;
@@ -74,7 +82,7 @@ function preProcessSoureFilePromise(sSourceFileName, sOutPutFolder){
 		    	}    	
 		    	
 		        bNextNewTrunk = xmlFileUtil.isNextNewTrunk(line.toString());
-		        if(bNextNewTrunk === true){        	
+		        if(bNextNewTrunk === true){
 		        	if(iLineNo > 0){
 		        		fs.appendFileSync(sChunkFileName, '</Metadata>' + "\n");
 		        		context.addChunkSize(iChunkNo,iContentCount);      		
@@ -121,7 +129,7 @@ function preProcessSoureFilePromise(sSourceFileName, sOutPutFolder){
 	});
 }
 
-function exceptProcessBigRow(sOutPutFolder,sTableName, sRow){
+metaDataProcess.prototype.exceptProcessBigRow = function(sOutPutFolder,sTableName, sRow){
 	let sExceptionFileName = sOutPutFolder + "/exceptBig.xml";
 	fs.appendFileSync(sExceptionFileName, '<Metadata>' + "\n");
 	fs.appendFileSync(sExceptionFileName, '<' + sTableName + '>' + "\n");
@@ -425,7 +433,9 @@ function filterSingleTable(sTableName, sOutputXMLFile, sRejectDataPath){
 
 	var oPromiseFilter = Promise.resolve();
 	oPromiseFilter = oPromiseFilter.then(() => {
-		preOutputTableFile(sTableName,sOutputTableFile, sRejectDataFile);
+		//preProcess should scan table configration to get table foreign key infomation
+		//so that later it can cash the data according to foreign key value
+		preProcessTableFile(sTableName,sOutputTableFile, sRejectDataFile);
 	});
 
 	oPromiseFilter = oPromiseFilter.then(() => {
@@ -433,7 +443,8 @@ function filterSingleTable(sTableName, sOutputXMLFile, sRejectDataPath){
 	});
 
 	oPromiseFilter = oPromiseFilter.then(() => {
-		postOutputTableFile(sTableName,sOutputTableFile, sRejectDataFile);
+		//postProcess should check if there is other table referece its foreign key, if no it can delete the foreign key
+		postProcessTableFile(sTableName,sOutputTableFile, sRejectDataFile);
 	});
 	
 	return oPromiseFilter;
@@ -462,27 +473,29 @@ function filterSingleTableFile(sTableName,iChunk,sValidOutputTableFile, sRejectO
 		parseXMLData(sFileContent);
 	})
 	.then((oJsonData) => {
-		let aTableData = oJsonData[sTable];		
-		let oResultData = filterSingleTableEntries(sTableName,aTableData);
-		let aValidData = oResultData["validData"];
-		let aRejectData = oResultData["rejectData"];
-		appendValidDataFile(sValidOutputTableFile, aFilteredResult)
-		.then(() => appendRejectDataFile(sRejectOutputTableFile, aRejectData));
+		let aTableChunkData = oJsonData[sTable];		
+		filterSingleTableEntries(sTableName,aTableChunkData);		
+		// .then(() => appendRejectDataFile(sRejectOutputTableFile, aRejectData));
+	})
+	.then((oResultData) => {
+		// let aValidData = oResultData["validData"];
+		// let aRejectData = oResultData["rejectData"];
+		appendValidDataFile(sValidOutputTableFile, sRejectOutputTableFile, oResultData);
 	});	
 }
 
-function filterSingleTableEntries(sTableName, aTableData){
+function filterSingleTableEntries(sTableName, aTableChunkData){
 	if(isSpecialTable(sTableName) === true){
-		return filterSpecialTableEntries(sTableName, aTableData);
+		return filterSpecialTableEntries(sTableName, aTableChunkData);
 	}else{
-		return filterNormalTableEntries(sTableName, aTableData);		
+		return filterNormalTableEntries(sTableName, aTableChunkData);		
 	}
 }
 
-function filterNormalTableEntries(sTableName, aTableData){
+function filterNormalTableEntries(sTableName, aTableChunkData){
 	let oTableKeyInfo;
 	let aTableForeignKeys = oTableKeyInfo.foreignKeys;
-	return validateRowForeigns(aTableData, aTableForeignKeys);
+	return validateTableDataForeigns(aTableChunkData, aTableForeignKeys);
 
 	// let oResultData = {};
 
@@ -531,50 +544,53 @@ function filterNormalTableEntries(sTableName, aTableData){
 	// return oResultData;
 }
 
-function validateTableDataForeigns(aTableData,  aTableForeignKeys){
+function validateTableDataForeigns(aTableChunkData,  aTableForeignKeys){
 
-	let oResultData = {};
+	var oPromiseValidate = new Promise((resolve, reject) => {
+	    let oResultData = {};
 
-	if(!aTableForeignKeys || aTableForeignKeys.length <= 0){
-		//no need to filter data, keep all the data
-		oResultData["validData"] = aTableData;
-		return oResultData;
-	}
+		if(!aTableForeignKeys || aTableForeignKeys.length <= 0){
+			//no need to filter data, keep all the data
+			oResultData["validData"] = aTableChunkData;
+			return oResultData;
+		}
 
-	let aValidData = [];
-	let aRejectData = [];	
-	let oReferenceTableColumn = {};
-	let oReferenceTableColumnValue,sTableColumnKey;
-	aTableForeignKeys.forEach(function(oForeignKey){
-		//use object to act as hash
-		oReferenceTableColumnValue = getValidColumnValue(oForeignKey.referenceTable, oForeignKey.referenceColumn);
-		sTableColumnKey = generateTableColumnKey(oForeignKey.referenceTable,oForeignKey.referenceColumn);
-		oReferenceTableColumn[sTableColumnKey] = oReferenceTableColumnValue;		
+		let aValidData = [];
+		let aRejectData = [];	
+		let oReferenceTableColumn = {};
+		let oReferenceTableColumnValue,sTableColumnKey;
+		aTableForeignKeys.forEach(function(oForeignKey){
+			//use object to act as hash
+			oReferenceTableColumnValue = getValidColumnValue(oForeignKey.referenceTable, oForeignKey.referenceColumn);
+			sTableColumnKey = generateTableColumnKey(oForeignKey.referenceTable,oForeignKey.referenceColumn);
+			oReferenceTableColumn[sTableColumnKey] = oReferenceTableColumnValue;		
+		});
+
+		
+
+		let iKeyCount = aTableForeignKeys.length;
+		let bRowValid = true;
+		let oRow = null;
+		for(let iRowIndex=0, iCount = aTableChunkData.length; iRowIndex<iCount; iRowIndex++){
+			bRowValid = true;
+			oRow = aTableData[iRowIndex];
+
+			bRowValid = validateTableRow(oRow, aTableForeignKeys, oReferenceTableColumn);
+			
+			if(bRowValid){
+				aValidData.push(oRow);
+			}else{
+				aRejectData.push(oRow);
+			}
+		}
+
+		oResultData["validData"] = aValidData;
+		oResultData["rejectData"] = aRejectData;
+
+		resolve(oResultData); 
 	});
 
-	
-
-	let iKeyCount = aTableForeignKeys.length;
-	let bRowValid = true;
-	let oRow = null;
-	for(let iRowIndex=0, iCount = aTableData.length; iRowIndex<iCount; iRowIndex++){
-		bRowValid = true;
-		oRow = aTableData[iRowIndex];
-
-		bRowValid = validateTableRow(oRow, aTableForeignKeys, oReferenceTableColumn);
-		
-		if(bRowValid){
-			aValidData.push(oRow);
-		}else{
-			aRejectData.push(oRow);
-		}
-	}
-
-	oResultData["validData"] = aValidData;
-	oResultData["rejectData"] = aRejectData;
-
-	return oResultData;
-
+	return oPromiseValidate;
 }
 
 function validateTableRow(oRow,  aTableForeignKeys, oReferenceTableColumn){

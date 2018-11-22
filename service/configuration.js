@@ -4,32 +4,23 @@ var serviceConfig = require("./config/serviceConfig");
 var componentConfig = require('./config/componentConfig.json');
 var groupConfig = require('./config/groupConfig.json');
 
-var sGroupConfigName = serviceConfig.appliedGroupConfigName;
-var oTablesOperate = {};
 
-var oGroupConfig = groupConfig[sGroupConfigName];
-var defaultOperator = oGroupConfig.defaultKeepInFile ? operateCons.OPERATE.KEEP : operateCons.OPERATE.REMOVE;
-
-for(sGroupName in oGroupConfig.groupDefination){
-	if(oGroupConfig.groupDefination.hasOwnProperty(sGroupName)){
-	// if(oGroupConfig.groupDefination.hasOwnProperty(sGroupName) && oGroupConfig.groupDefination.keepInFile){
-		let oGroupDefination = oGroupConfig.groupDefination[sGroupName];
-		let bKeepInFile = oGroupDefination.keepInFile;	
-		let iCompCount = oGroupDefination.components.length;
-		for(let iIndex=0; iIndex<iCompCount; iIndex++){
-			sComName = oGroupDefination.components[iIndex];
-			if(!componentConfig[sComName]){
-				console.log("Component " + sComName + " does not exist which is defined in group " + sGroupName);
-        		// return;
-        		continue;
-			}
-			let iTableCount = componentConfig[sComName].tables ? componentConfig[sComName].tables.length : 0;
-			for(iTableIndex=0; iTableIndex<iTableCount; iTableIndex++){
-				oTablesOperate[componentConfig[sComName].tables[iTableIndex]] = bKeepInFile ? operateCons.OPERATE.KEEP : operateCons.OPERATE.REMOVE;
-			}
-		}
-	}
+function getBasicTypeId(){
+	return  {
+		"%APPSETID%" : "UJA_APPL"
+	};
 }
+
+//internal data
+// {
+//   "UJA_APPL": {  		
+// 	  	"referencedByTables":[
+// 	  	],
+// 	  	"isBasicData":true	  
+//   	},  	
+// }
+
+
 
 function validateComponent(oGroupConfig,componentConfig){
 	var oComponents = prepareComponent(oGroupConfig,componentConfig);
@@ -117,5 +108,45 @@ var getDefaultOperate = function(){
 	return defaultOperator;
 };
 
+var init = function(){
+	//check component dependency
+	//filter component according to groupConfig
+	//check inconsistent between component dependency and table foreign key, 	
+		//if one table does not belong to any component, log the table name and report error
+	//generate table dependency according to component dependency and table foreign key
+	//collect fileservice folder related infomation
+	//generate valid fileservice pattern
+	var sGroupConfigName = serviceConfig.appliedGroupConfigName;
+	var oTablesOperate = {};
+
+	var oGroupConfig = groupConfig[sGroupConfigName];
+	var defaultOperator = oGroupConfig.defaultKeepInFile ? operateCons.OPERATE.KEEP : operateCons.OPERATE.REMOVE;
+
+	for(sGroupName in oGroupConfig.groupDefination){
+		if(oGroupConfig.groupDefination.hasOwnProperty(sGroupName)){
+		// if(oGroupConfig.groupDefination.hasOwnProperty(sGroupName) && oGroupConfig.groupDefination.keepInFile){
+			let oGroupDefination = oGroupConfig.groupDefination[sGroupName];
+			let bKeepInFile = oGroupDefination.keepInFile;	
+			let iCompCount = oGroupDefination.components.length;
+			for(let iIndex=0; iIndex<iCompCount; iIndex++){
+				sComName = oGroupDefination.components[iIndex];
+				if(!componentConfig[sComName]){
+					console.log("Component " + sComName + " does not exist which is defined in group " + sGroupName);
+	        		// return;
+	        		continue;
+				}
+				let iTableCount = componentConfig[sComName].tables ? componentConfig[sComName].tables.length : 0;
+				for(iTableIndex=0; iTableIndex<iTableCount; iTableIndex++){
+					oTablesOperate[componentConfig[sComName].tables[iTableIndex]] = bKeepInFile ? operateCons.OPERATE.KEEP : operateCons.OPERATE.REMOVE;
+				}
+			}
+		}
+	}
+};
+
+
+
 exports.getTablesOperate = getTablesOperate;
 exports.getDefaultOperate = getDefaultOperate;
+exports.tableMetadata = tableMetadata;
+exports.getBasicTypeId = getBasicTypeId;
