@@ -1,51 +1,79 @@
-var fs = require('fs'),
-    fsExtra = require('fs-extra'),
-    // xml2js = require('xml2js'),
-    metaDataProcessor = require('./service/metaDataProcessor');
-    // context = require('./service/context'),
-    // xmlFileUtil = require('./service/xmlFileUtility'),    
-    // config = require('./service/configuration'),
-    // readline = require('readline');
+var context = require('./service/context'),
+	mProcessor = require('./service/metaDataProcessor'),
+    fProcessor = require('./service/fileProcessor'),
+    configuration = require('./configuration');
 
-// const operateCons = require("./service/config/constants.json");
-// var parser = new xml2js.Parser();
-// var sOutPutXMLFolder = __dirname + "/tempFolder";
-// var sSourceXMLFile = __dirname + '/exampleData/Metadata.xml';
+function process(){
+	let sSourceFolder = getSourceFolder();
+	let sSourceMetadataFile = getSourceMetadataXMLFile();
+	let sOutputFolder = getOutputFolder();
+	let sOutPutRejectFolder = getOutputRejectFolder();
+	let sOutPutResultFolder = getOutputResultFolder();
+	let sGroupConfig = getDynamicGroupConfig();
+	let oConfiguration = new configuration(sGroupConfig);
+	let oContext = new context();
 
-function getSourceXMLFile(){
-	const sSourceXMLFile = __dirname + '/exampleData/Metadata.xml';
-	return sSourceXMLFile;
+	oConfiguration.init()
+	.then(()=>{
+		let oFProcessor = new fProcessor(oConfiguration, sSourceFolder, sOutputFolder, sOutPutResultFolder, sOutPutRejectFolder);
+		oFProcessor.cleanOutputFolder();
+	})	
+	.then(()=>{
+		let oMProcessor = new mProcessor(oConfiguration, sSourceMetadataFile, sOutputFolder, sOutPutResultFolder, sOutPutRejectFolder);
+		return oMProcessor.processMetadata(oFProcessor, oContext);	
+	})
+	.then((oMProcessor)=>{
+		return oFProcessor.processFile(oMProcessor, oContext);
+	})
+	.then(()=>{
+		console.log("Success to process data");
+	})
+	.catch((error)=>{
+		console.log("Fail to process data");
+		console.log(error);
+	});
 }
 
-function getTempFolder(){
-	const sOutPutXMLFolder = __dirname + "/tempFolder";
-	return sOutPutXMLFolder;
+//this function is used to support UI to let user select entity to filter data
+//do not support package first
+function getComponentEntityList(sSourceFolder, sComponentName){
+
 }
 
-function cleanTempFiles(sOutPutFolder){
-	fsExtra.removeSync(sOutPutFolder);
-	fs.mkdirSync(sOutPutFolder);
+function getSourceFolder(){
+	return __dirname + '/exampleData';	
 }
 
-let sOutPutXMLFolder = getTempFolder();
-let sSourceXMLFile = getSourceXMLFile();
-cleanTempFiles(sOutPutXMLFolder);
-// metaDataProcessor.preProcessSoureFile(sSourceXMLFile,sOutPutXMLFolder);
+function getSourceMetadataXMLFile(){
+	return getSourceXMLFile() + '/Metadata.xml';	
+}
 
-metaDataProcessor.preProcessSoureFilePromise(sSourceXMLFile,sOutPutXMLFolder)
-	// .then(()=> metaDataProcessor.getAppsetPromise())
-	// .then(()=> metaDataProcessor.filterMetadataTableEntriesPromise())
-	// .then(()=> metaDataProcessor.generateNewMetadataPromise())
-	.then(oResult=> console.log(oResult))
-	.catch(error => console.log(error));
+function getOutputFolder(){
+	return __dirname + "/output";	
+}
+
+function getOutputRejectFolder(){
+	return getOutputFolder() + "/rejectOutput";	
+}
+
+function getOutputResultFolder(){
+	return getOutputFolder() + "/result";	
+}
+
+function getDynamicGroupConfig(){
+	return __dirname + '/config/defaultGroupConfig.json';	
+}
 
 
+// cleanTempFiles(sOutPutXMLFolder);
 
 
-
-
-
-
+// metaDataProcessor.preProcessSoureFilePromise(sSourceXMLFile,sOutPutXMLFolder)
+// 	// .then(()=> metaDataProcessor.getAppsetPromise())
+// 	// .then(()=> metaDataProcessor.filterMetadataTableEntriesPromise())
+// 	// .then(()=> metaDataProcessor.generateNewMetadataPromise())
+// 	.then(oResult=> console.log(oResult))
+// 	.catch(error => console.log(error));
 
 
 

@@ -9,7 +9,12 @@
       "UJB_STEP_RGN_O_A",
       "UJB_TMPL_HDRT_A",
       "UJB_TMPL_HDR_A"
-    ]    
+    ],
+    "driverKeys":{
+      "table": "",
+      "keyColumns":[
+      ]
+    }
   },
   "books": {
     "dependencies": [
@@ -29,7 +34,7 @@
   "BPFModeling": {
     "dependencies": [
       "environment",
-      "persistenceResource"   
+      "persistenceResource"
     ],
     "tables": [
       "UJB_DRV_DIM",
@@ -59,7 +64,7 @@
   },
   "BPFInstance": {
     "dependencies": [
-      "BPFModeling"     
+      "BPFModeling"
     ],
     "tables": [
       "UJB_INST",
@@ -80,7 +85,7 @@
   },
   "businessRule": {
     "dependencies": [
-      "model"     
+      "model"
     ],
     "tables": [
       "UJP_DIM_GENERATE",
@@ -97,19 +102,17 @@
   },
   "commentData": {
     "dependencies": [
-      "model"     
+      "model"
     ],
-    "folder": [
+    "filePath": [
       "Comments.Audit.Journals/%applId%/COMMENT"
     ]
   },
-  "consolidationData": {
-
-  },
+  "consolidationData": {},
   "contentLibrary": {
     "dependencies": [
       "environment",
-      "persistenceResource"   
+      "persistenceResource"
     ],
     "tables": [
       "UJH_RCPT_TEAM",
@@ -128,15 +131,13 @@
   "controlData": {},
   "DAP": {
     "dependencies": [
-      "model"     
+      "model"
     ],
     "tables": [
       "UJE_MEMACCESS"
     ]
   },
-  "dataAuditData": {
-
-  },
+  "dataAuditData": {},
   "dataManagerDataFile": {
     "dependencies": [
       "model"
@@ -171,7 +172,7 @@
       "UJD_PACKAGES2",
       "UJD_PACKAGEST2",
       "UJD_PACKAGE_LINK"
-    ]   
+    ]
   },
   "dataManagerTransFile": {
     "dependencies": [
@@ -235,20 +236,21 @@
   },
   "journalData": {
     "dependencies": [
-      "model"     
+      "model"
     ],
-    "folder": [
+    "filePath": [
       "Comments.Audit.Journals/%applId%/JOURNAL_DETAIL"
     ]
   },
   "masterData": {
     "dependencies": [
       "model"
-    ]
+    ],
+    "filePath":"/Master Data/%dimensionId%"
   },
   "model": {
     "dependencies": [
-      "environment"     
+      "environment"
     ],
     "tables": [
       "UJ0_PARAM_APP",
@@ -321,6 +323,9 @@
     "dependencies": [
       "model",
       "masterData"
+    ],
+    "filePath": [
+      "/Transaction Data/%applId%/"
     ]
   },
   "user": {
@@ -331,7 +336,5 @@
       "UJE_USER_AGR"
     ]
   },
-  "workstatusLock": {
-    
-  }
+  "workstatusLock": {}
 }

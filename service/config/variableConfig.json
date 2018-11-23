@@ -1,0 +1,83 @@
+{
+	"%APPSETID%": {
+		"referenceTable": "UJA_APPSET_INFO",
+		"referenceColumns": [
+			{
+				"fieldValue": "%MANDT%",
+				"referenceColumn": "MANDT"
+			},
+			{
+				"fieldValue": "%APPSETID%",
+				"referenceColumn": "APPSET_ID"
+			}
+		]
+	},
+	"%applId%": {
+		"tableName": "UJA_APPL",
+		"referenceColumns": [
+			{
+				"fieldValue": "%MANDT%",
+				"referenceColumn": "MANDT"
+			},
+			{
+				"fieldValue": "%APPSETID%",
+				"referenceColumn": "APPSET_ID"
+			},
+			{
+				"fieldValue": "%applId%",
+				"referenceColumn": "APPLICATION_ID"
+			}
+		]
+	},
+	"%teamId%": {
+		"tableName": "UJE_TEAM",
+		"referenceColumns": [
+			{
+				"fieldValue": "%MANDT%",
+				"referenceColumn": "MANDT"
+			},
+			{
+				"fieldValue": "%APPSETID%",
+				"referenceColumn": "APPSET_ID"
+			},
+			{
+				"fieldValue": "%teamId%",
+				"referenceColumn": "TEAM_ID"
+			}
+		]
+	},
+	"%userId%": {
+		"tableName": "UJE_USER",
+		"referenceColumns": [
+			{
+				"fieldValue": "%MANDT%",
+				"referenceColumn": "MANDT"
+			},
+			{
+				"fieldValue": "%APPSETID%",
+				"referenceColumn": "APPSET_ID"
+			},
+			{
+				"fieldValue": "%userId%",
+				"referenceColumn": "USER_ID"
+			}
+		]
+	},
+	"%dimensionId%": {
+		"tableName": "UJA_DIMENSION",
+		"referenceColumns": [
+			{
+				"fieldValue": "%MANDT%",
+				"referenceColumn": "MANDT"
+			},
+			{
+				"fieldValue": "%APPSETID%",
+				"referenceColumn": "APPSET_ID"
+			},
+			{
+				"fieldValue": "%dimensionId%",
+				"referenceColumn": "DIMENSION"
+			}
+		]
+	}
+}

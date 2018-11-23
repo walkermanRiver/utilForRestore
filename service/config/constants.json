@@ -25,5 +25,9 @@
 		"INVALID": -1,
 		"UNKNOWN": 0,
 		"VALID": 1		
+	},
+	"OBJECTTYPE":{
+		"TABLE": 1,
+		"VARIABLE": 2
 	}
 }

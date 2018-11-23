@@ -5,7 +5,27 @@
       "archivedData": {
         "keepInFile": "flase",
         "components": [
-          "archivedData"
+          {
+            "archivedData": {
+              "filter": {
+                "columnA": [
+                  "a",
+                  "b"
+                ],
+                "columnB": []
+              },
+              "combinationKey": [
+                {
+                  "columnA": "a",
+                  "columnB": "b"
+                },
+                {
+                  "columnA": "a2",
+                  "columnB": "b2"
+                }
+              ]
+            }
+          }
         ]
       },
       "BPFModeling": {

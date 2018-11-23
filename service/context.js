@@ -10,10 +10,14 @@ var oComponentConfig = null;
 var oGroupConfig = null;
 var oAppset = {};
 
-var parseAppsetRoot = function(config, oResult){
+function context(){
+
+}
+
+context.prototype.parseAppsetRoot = function(config, oResult){
 };
 
-var parseXMLInfo = function(config, oResult){
+context.prototype.parseXMLInfo = function(config, oResult){
 	sAppsetName = oResult.AppsetData.$.APPSET_ID;
     console.log("appsetId is :" + sAppsetName);
 
@@ -31,7 +35,7 @@ var parseXMLInfo = function(config, oResult){
     return oTables;
 };
 
-var collectDDICTableName = function(oTablesOperate, oTables, defaultOperate){
+context.prototype.collectDDICTableName = function(oTablesOperate, oTables, defaultOperate){
 	let iCount = Object.getOwnPropertyNames(oTables).length;
     console.log("There are " + iCount + " DDIC tables");
 
@@ -49,11 +53,11 @@ var collectDDICTableName = function(oTablesOperate, oTables, defaultOperate){
     }
 };
 
-var getTableList = function(){
+context.prototype.getTableList = function(){
 	return oTableNames;
 };
 
-var formatJson = function(aOldData){
+context.prototype.formatJson = function(aOldData){
     let iTotalRowCount = aOldData[0].Row.length;
     if(iTotalRowCount === 0){
         return null;
@@ -67,30 +71,23 @@ var formatJson = function(aOldData){
 
 };
 
-var addTableMapping = function(sTableName, sChunkName){
+context.prototype.addTableMapping = function(sTableName, sChunkName){
     if(!oMapTableChunk[sTableName]){
         oMapTableChunk[sTableName] = [];
     }
     oMapTableChunk[sTableName].push(sChunkName);
 };
 
-var getTableMapping = function(){
+context.prototype.getTableMapping = function(){
     return oMapTableChunk;
 }
 
-var addChunkSize = function(sChunkName, iSize){
+context.prototype.addChunkSize = function(sChunkName, iSize){
     oChunkSize[sChunkName] = iSize;
 };
 
-var getChunkSize = function(){
+context.prototype.getChunkSize = function(){
     return oChunkSize;
 };
 
-exports.parseXMLInfo = parseXMLInfo;
-exports.getTableList = getTableList;
-exports.formatJson = formatJson;
-exports.addTableMapping = addTableMapping;
-exports.getTableMapping = getTableMapping;
-exports.addChunkSize = addChunkSize;
-exports.getChunkSize = getChunkSize;
-exports.oAppset = oAppset;
+exports.context = context;

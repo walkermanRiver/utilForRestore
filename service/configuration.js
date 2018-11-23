@@ -4,25 +4,50 @@ var serviceConfig = require("./config/serviceConfig");
 var componentConfig = require('./config/componentConfig.json');
 var groupConfig = require('./config/groupConfig.json');
 
+function configuration(sGroupConfigFile){
 
-function getBasicTypeId(){
-	return  {
-		"%APPSETID%" : "UJA_APPL"
-	};
 }
 
-//internal data
-// {
-//   "UJA_APPL": {  		
-// 	  	"referencedByTables":[
-// 	  	],
-// 	  	"isBasicData":true	  
-//   	},  	
-// }
+configuration.prototype.getTableDependency = function(){
+	return;
+	var a =
+	[
+		{
+		  "UJA_APPL": {
+		    "primaryKeys": [
+		      "MANDT",
+		      "APPSET_ID",
+		      "APPLICATION_ID"
+		    ],
+		    "foreignKeys": [
+		      {
+		        "referenceTable": "UJA_APPSETT",
+		        "foreignKey": [
+		          {
+		            "column": "MANDT",
+		            "referenceColumn": "MANDT"
+		          },
+		          {
+		            "column": "APPSET_ID",
+		            "referenceColumn": "APPSET_ID"
+		          }
+		        ]
+		      }
+		    ],
+		    "cacheDataColumnKeys":[
+		    	[
+		    		"MANDT",
+		    		"APPSET_ID",
+		    		"APPLICATION_ID"
+		    	]		    	
+		    ]
+		  }
+		}
+	];
+};
 
 
-
-function validateComponent(oGroupConfig,componentConfig){
+configuration.prototype.validateComponent = function(oGroupConfig,componentConfig){
 	var oComponents = prepareComponent(oGroupConfig,componentConfig);
 
 	var aComponents = [];
@@ -45,10 +70,10 @@ function validateComponent(oGroupConfig,componentConfig){
 			}
 		}
 	}
-}
+};
 
 //only collect components that is configured kept, but are not validated based on dependency
-function prepareComponent(oGroupConfig,componentConfig){
+configuration.prototype.prepareComponent = function(oGroupConfig,componentConfig){
 	let bCorrect = checkDependency(oGroupConfig,componentConfig);
 	if(bCorrect === false){
 		return false;
@@ -86,33 +111,35 @@ function prepareComponent(oGroupConfig,componentConfig){
 			delete oComponents[sComName];
 		}	
 	}
-}
+};
 
 
 //check one component can be kept only if all its dependency are kept
-function checkComKeepDepd(oComponents, sComName, iIndex){
+configuration.prototype.checkComKeepDepd = function(oComponents, sComName, iIndex){
 
-}
+};
 
 //check if the groupConfig.json has cycle dependency
-function checkDependency(oGroupConfig, componentConfig){
+configuration.prototype.checkDependency = function(oGroupConfig, componentConfig){
 	//TBD
 	return true;
-}
+};
 
-var getTablesOperate = function(){
+configuration.prototype.getTablesOperate = function(){
 	return oTablesOperate;
 };
 
-var getDefaultOperate = function(){
+configuration.prototype.getDefaultOperate = function(){
 	return defaultOperator;
 };
 
-var init = function(){
+configuration.prototype.init = function(){
 	//check component dependency
 	//filter component according to groupConfig
 	//check inconsistent between component dependency and table foreign key, 	
 		//if one table does not belong to any component, log the table name and report error
+	//merge the tableConfig and variableConfig so that all tables can be put together to calculate ordr and check if still need cache
+		//if we find user,team is filtered, then we do not need merge user and team
 	//generate table dependency according to component dependency and table foreign key
 	//collect fileservice folder related infomation
 	//generate valid fileservice pattern
@@ -144,9 +171,4 @@ var init = function(){
 	}
 };
 
-
-
-exports.getTablesOperate = getTablesOperate;
-exports.getDefaultOperate = getDefaultOperate;
-exports.tableMetadata = tableMetadata;
-exports.getBasicTypeId = getBasicTypeId;
+exports.configuration = configuration;
